@@ -2,4 +2,4 @@
 
 `gui.py` is where the action is at
 
-_NOTE: this readme is a work-in-progress, it is being worked on over time. If you require any specific information in the meantime please create a github issue and I will try to address your questions once I get the chance. Thanks! :)_
+_[NOTE]: This readme is a work-in-progress. If you require any specific information, please submit a github issue. I will try my best to address any questions you have in this readme once I get the chance. Thanks! :)_

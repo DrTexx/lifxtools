@@ -6,11 +6,12 @@ import sys # used for processing CLI arguments
 from tkinter import * # for UI
 from tkinter.ttk import * # for not ugly UI
 from time import sleep # used for delays
-from lifxlan import LifxLAN, RED # used for controlling lights
+from lifxlan import LifxLAN, RED, WHITE # used for controlling lights
 # settings
 num_lights = None
 default_brightness = True
 default_color = (58275, 0, 33968, 3500)
+debug = True
 
 # configuration
 #num_lights = 1 # makes discovery much faster when specified
@@ -30,7 +31,7 @@ def return_num_lights(devices):
 def list_devices(devices):
     i = 0
     for device in devices:
-        print("devices[{}] = [label='{}', power={}, color={}])".format(i,device.get_label(),device.get_power(),device.get_color()))
+        if (debug==True): print("devices[{}] = [label='{}', power={}, color={}])".format(i,device.get_label(),device.get_power(),device.get_color()))
         i += 1
 
 def blink_devices(devices):
@@ -49,13 +50,16 @@ def toggle_light(_light,brightness):
     light_power = _light.get_power()
     if (light_power == 0):
         _light.set_power(brightness)
+        if (debug==True): print("{} power set to {}".format(_light.get_label(), brightness))
     elif (light_power > 0):
         _light.set_power(False)
+        if (debug==True): print("{} turned off".format(_light.get_label()))
     else:
-        print("WIP: power other than 0 or 65535 not currently supported")
+        print("WIP: power other than True or False not currently supported, using 65535 range is not yet implemented")
 
 def set_light_color(_light,color):
     _light.set_color(color)
+    if (debug==True): print("{} color set to {}".format(_light.get_label(),color))
 
 # main function
 def main():
@@ -97,11 +101,15 @@ def main():
             light0_reset_color = Button(light0_frame, text="reset color", command=self.reset_color_light_0)
             light0_reset_color.pack(side=LEFT)
 
+            light0_set_white = Button(light0_frame, text="set white", command=self.set_white_light_0)
+            light0_set_white.pack(side=LEFT)
+
             light0_set_red = Button(light0_frame, text="set red", command=self.set_red_light_0)
             light0_set_red.pack(side=LEFT)
 
         def toggle_light_0(self): toggle_light(devices[0],default_brightness)
         def reset_color_light_0(self): set_light_color(devices[0],default_color)
+        def set_white_light_0(self): set_light_color(devices[0],WHITE)
         def set_red_light_0(self): set_light_color(devices[0],RED)
 
         def _exit_app(self,event):

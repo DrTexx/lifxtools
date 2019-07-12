@@ -9,9 +9,8 @@ from time import sleep # used for delays
 from lifxlan import LifxLAN, RED, WHITE # used for controlling lights
 # settings
 num_lights = None
-default_brightness = True
-default_color = (58275, 0, 33968, 3500)
-bedtime_color = (58275, 3, 18010, 2000)
+default_color = (58275, 0, 33968, 3500) # roughly 50% brightness at 3500k
+bedtime_color = (58275, 0, 18010, 2000) # roughly 25% brightness at 2000k
 debug = True
 
 # configuration
@@ -47,11 +46,11 @@ def blink_devices(devices):
 
         device.set_power(original_power)
 
-def toggle_light(_light,brightness):
+def toggle_light(_light):
     light_power = _light.get_power()
     if (light_power == 0):
-        _light.set_power(brightness)
-        if (debug==True): print("{} power set to {}".format(_light.get_label(), brightness))
+        _light.set_power(True)
+        if (debug==True): print("{} turned on".format(_light.get_label()))
     elif (light_power > 0):
         _light.set_power(False)
         if (debug==True): print("{} turned off".format(_light.get_label()))
@@ -111,7 +110,7 @@ def main():
             light0_set_red = Button(light0_frame, text="set red", command=self.set_red_light_0)
             light0_set_red.pack(side=LEFT)
 
-        def toggle_light_0(self): toggle_light(devices[0],default_brightness)
+        def toggle_light_0(self): toggle_light(devices[0])
         def reset_color_light_0(self): set_light_color(devices[0],default_color)
         def bedtime_color_light_0(self): set_light_color(devices[0],bedtime_color)
         def set_white_light_0(self): set_light_color(devices[0],WHITE)

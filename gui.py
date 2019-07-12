@@ -6,10 +6,11 @@ import sys # used for processing CLI arguments
 from tkinter import * # for UI
 from tkinter.ttk import * # for not ugly UI
 from time import sleep # used for delays
-from lifxlan import LifxLAN # used for controlling lights
+from lifxlan import LifxLAN, RED # used for controlling lights
 # settings
 num_lights = None
 default_brightness = True
+default_color = (58275, 0, 33968, 3500)
 
 # configuration
 #num_lights = 1 # makes discovery much faster when specified
@@ -44,10 +45,6 @@ def blink_devices(devices):
 
         device.set_power(original_power)
 
-def gen_device_list(_devices,_listbox):
-    for device in _devices:
-        _listbox.insert(END, device.get_label())
-
 def toggle_light(_light,brightness):
     light_power = _light.get_power()
     if (light_power == 0):
@@ -57,6 +54,8 @@ def toggle_light(_light,brightness):
     else:
         print("WIP: power other than 0 or 65535 not currently supported")
 
+def set_light_color(_light,color):
+    _light.set_color(color)
 
 # main function
 def main():
@@ -85,14 +84,25 @@ def main():
             test_text = Label(test_frame,text="Lights discovered")
             test_text.pack()
 
-            test_listbox = Listbox(test_frame)
-            test_listbox.pack()
-            gen_device_list(devices,test_listbox)
+            light0_frame = Frame(test_frame)
+            light0_frame.config(padding=5,relief=SUNKEN)
+            light0_frame.pack()
 
-            test_button = Button(test_frame, text="toggle light 0", command=self.toggle_light_0)
-            test_button.pack()
+            light0_name = Label(light0_frame, text=str(devices[0].get_label()))
+            light0_name.pack(side=LEFT)
+
+            light0_toggle = Button(light0_frame, text="toggle power", command=self.toggle_light_0)
+            light0_toggle.pack(side=LEFT)
+
+            light0_reset_color = Button(light0_frame, text="reset color", command=self.reset_color_light_0)
+            light0_reset_color.pack(side=LEFT)
+
+            light0_set_red = Button(light0_frame, text="set red", command=self.set_red_light_0)
+            light0_set_red.pack(side=LEFT)
 
         def toggle_light_0(self): toggle_light(devices[0],default_brightness)
+        def reset_color_light_0(self): set_light_color(devices[0],default_color)
+        def set_red_light_0(self): set_light_color(devices[0],RED)
 
         def _exit_app(self,event):
             exit()

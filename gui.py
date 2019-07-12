@@ -11,6 +11,7 @@ from lifxlan import LifxLAN, RED, WHITE # used for controlling lights
 num_lights = None
 default_brightness = True
 default_color = (58275, 0, 33968, 3500)
+bedtime_color = (58275, 3, 18010, 2000)
 debug = True
 
 # configuration
@@ -101,6 +102,9 @@ def main():
             light0_reset_color = Button(light0_frame, text="reset color", command=self.reset_color_light_0)
             light0_reset_color.pack(side=LEFT)
 
+            light0_bedtime_color = Button(light0_frame, text="bedtime color", command=self.bedtime_color_light_0)
+            light0_bedtime_color.pack(side=LEFT)
+
             light0_set_white = Button(light0_frame, text="set white", command=self.set_white_light_0)
             light0_set_white.pack(side=LEFT)
 
@@ -109,6 +113,7 @@ def main():
 
         def toggle_light_0(self): toggle_light(devices[0],default_brightness)
         def reset_color_light_0(self): set_light_color(devices[0],default_color)
+        def bedtime_color_light_0(self): set_light_color(devices[0],bedtime_color)
         def set_white_light_0(self): set_light_color(devices[0],WHITE)
         def set_red_light_0(self): set_light_color(devices[0],RED)
 

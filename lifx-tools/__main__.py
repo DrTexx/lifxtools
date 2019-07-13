@@ -130,6 +130,7 @@ def main():
 
                 light_profile_red = Button(_light_frame, text="red color", command=lambda: set_light_color(_light_device, RED))
                 light_profile_red.pack(side=LEFT)
+                i += 1
 
             if (debug == True): print(self.light_settings)
             light0_frame = self.light_settings[0]['frame'] # TEMPORARY UNTIL CODE BELOW MIGRATED TO ITERABLE FORMAT

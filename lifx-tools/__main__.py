@@ -71,7 +71,7 @@ def main():
     devices = lifx.get_lights()
     num_lights = return_num_lights(devices)
     list_devices(devices)
-    #blink_devices(devices)
+    # blink_devices(devices)
 
     root = Tk()
 

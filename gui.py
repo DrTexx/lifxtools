@@ -64,7 +64,6 @@ def set_light_color(_light,color):
 
 def get_light_color(_light): return(_light.get_color())
 def get_light_brightness(_light): return(get_light_color(_light)[2])
-def reset_color(_light): set_light_color(_light,default_color)
 
 # main function
 def main():
@@ -120,42 +119,24 @@ def main():
                 # light_brightness = Scale(_light_frame, from_=0, to=65535, orient=HORIZONTAL) # this needs to be accessible outside of for loop, right now it is not
                 # light_brightness.pack(side=LEFT)
 
-                light_profile_reset = Button(_light_frame, text="reset color", command=lambda: reset_color(_light_device))
-                light_profile_reset.pack(side=LEFT)
+                light_profile_default = Button(_light_frame, text="default color", command=lambda: set_light_color(_light_device,default_color))
+                light_profile_default.pack(side=LEFT)
 
-            print(self.light_settings)
+                light_profile_bedtime = Button(_light_frame, text="bedtime color", command=lambda: set_light_color(_light_device,bedtime_color))
+                light_profile_bedtime.pack(side=LEFT)
+
+                light_profile_white = Button(_light_frame, text="white color", command=lambda: set_light_color(_light_device, WHITE))
+                light_profile_white.pack(side=LEFT)
+
+                light_profile_red = Button(_light_frame, text="red color", command=lambda: set_light_color(_light_device, RED))
+                light_profile_red.pack(side=LEFT)
+
+            if (debug == True): print(self.light_settings)
             light0_frame = self.light_settings[0]['frame'] # TEMPORARY UNTIL CODE BELOW MIGRATED TO ITERABLE FORMAT
-
-            # light0_frame = Frame(test_frame)
-            # light0_frame.config(padding=5,relief=SUNKEN)
-            # light0_frame.pack()
-
-            # light0_name = Label(light0_frame, text=str(devices[0].get_label()))
-            # light0_name.pack(side=LEFT)
-
-            # light0_toggle = Button(light0_frame, text="toggle power", command=self.toggle_light_0)
-            # light0_toggle.pack(side=LEFT)
 
             self.light0_brightness = Scale(light0_frame, from_=0, to=65535,orient=HORIZONTAL)
             self.light0_brightness.pack(side=LEFT)
 
-            light0_reset_color = Button(light0_frame, text="reset color", command=self.reset_color_light_0)
-            light0_reset_color.pack(side=LEFT)
-
-            light0_bedtime_color = Button(light0_frame, text="bedtime color", command=self.bedtime_color_light_0)
-            light0_bedtime_color.pack(side=LEFT)
-
-            light0_set_white = Button(light0_frame, text="set white", command=self.set_white_light_0)
-            light0_set_white.pack(side=LEFT)
-
-            light0_set_red = Button(light0_frame, text="set red", command=self.set_red_light_0)
-            light0_set_red.pack(side=LEFT)
-
-        def toggle_light_0(self): toggle_light(devices[0])
-        def reset_color_light_0(self): set_light_color(devices[0],default_color)
-        def bedtime_color_light_0(self): set_light_color(devices[0],bedtime_color)
-        def set_white_light_0(self): set_light_color(devices[0],WHITE)
-        def set_red_light_0(self): set_light_color(devices[0],RED)
         def _update_brightness(self): self.light0_brightness.set(get_light_brightness(devices[0]))
 
         def _update_loop(self,ms_per_loop=1000):

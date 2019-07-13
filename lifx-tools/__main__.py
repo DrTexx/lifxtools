@@ -105,7 +105,7 @@ def main():
                 self.light_settings.append({'device': device, 'frame': Frame(test_frame)}) # add frames and all relevant things here
                 # configure frames and relevant items here
                 self.light_settings[i]['frame'].config(padding=5,relief=SUNKEN)
-                self.light_settings[i]['frame'].pack()
+                self.light_settings[i]['frame'].pack(fill=X)
 
                 _light_device = self.light_settings[i]['device']
                 _light_frame = self.light_settings[i]['frame']

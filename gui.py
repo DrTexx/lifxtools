@@ -64,6 +64,7 @@ def set_light_color(_light,color):
 
 def get_light_color(_light): return(_light.get_color())
 def get_light_brightness(_light): return(get_light_color(_light)[2])
+def reset_color(_light): set_light_color(_light,default_color)
 
 # main function
 def main():
@@ -107,6 +108,21 @@ def main():
                 self.light_settings[i]['frame'].config(padding=5,relief=SUNKEN)
                 self.light_settings[i]['frame'].pack()
 
+                _light_device = self.light_settings[i]['device']
+                _light_frame = self.light_settings[i]['frame']
+
+                light_label = Label(_light_frame, text=str(_light_device.get_label()))
+                light_label.pack(side=LEFT)
+
+                light_toggle = Button(_light_frame, text="toggle power", command=lambda: toggle_light(_light_device))
+                light_toggle.pack(side=LEFT)
+
+                # light_brightness = Scale(_light_frame, from_=0, to=65535, orient=HORIZONTAL) # this needs to be accessible outside of for loop, right now it is not
+                # light_brightness.pack(side=LEFT)
+
+                light_profile_reset = Button(_light_frame, text="reset color", command=lambda: reset_color(_light_device))
+                light_profile_reset.pack(side=LEFT)
+
             print(self.light_settings)
             light0_frame = self.light_settings[0]['frame'] # TEMPORARY UNTIL CODE BELOW MIGRATED TO ITERABLE FORMAT
 
@@ -114,11 +130,11 @@ def main():
             # light0_frame.config(padding=5,relief=SUNKEN)
             # light0_frame.pack()
 
-            light0_name = Label(light0_frame, text=str(devices[0].get_label()))
-            light0_name.pack(side=LEFT)
+            # light0_name = Label(light0_frame, text=str(devices[0].get_label()))
+            # light0_name.pack(side=LEFT)
 
-            light0_toggle = Button(light0_frame, text="toggle power", command=self.toggle_light_0)
-            light0_toggle.pack(side=LEFT)
+            # light0_toggle = Button(light0_frame, text="toggle power", command=self.toggle_light_0)
+            # light0_toggle.pack(side=LEFT)
 
             self.light0_brightness = Scale(light0_frame, from_=0, to=65535,orient=HORIZONTAL)
             self.light0_brightness.pack(side=LEFT)

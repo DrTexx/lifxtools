@@ -4,10 +4,14 @@ lt module from lifxtools package
 
 print("lifxtools/lt/__init__.py")
 
+# imports
 from lifxtools import *
 
+# settings
+debug = True
+
 def start():
-    lifx = return_interface()
+    lifx = return_interface(debug=debug)
     devices = lifx.get_lights()
     num_lights = return_num_lights(devices)
     list_devices(devices)

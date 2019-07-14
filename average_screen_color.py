@@ -28,8 +28,8 @@ fade_mode = fade_modes['desktop']
 #img_anti.save(new_image_file)
 #print("resized file saved as %s" % new_image_file)
 
-# helper for colors conversion/scaling
 def rgb2hsv(r, g, b):
+    ''' helper for colors conversion/scaling '''
     h, s, v = colorsys.rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)
     h = h * 0xffff
     s = s * 0xffff
@@ -37,6 +37,7 @@ def rgb2hsv(r, g, b):
     return(h, s, v)
 
 def get_color_averages(img,totpixels):
+    '''get averages of colors in image'''
     total_red = total_green = total_blue = 0
     for y in range(0, img.size[1]):
         for x in range(0, img.size[0]):

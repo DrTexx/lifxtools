@@ -14,7 +14,7 @@ from PIL import Image
 import time, os, colorsys
 
 # static options
-fade_modes = {'game': 0, 'movie': 150}
+fade_modes = {'game': 0, 'movie': 150, 'desktop': 300}
 
 # preferences
 factor = 0.75

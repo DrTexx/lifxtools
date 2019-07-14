@@ -57,6 +57,32 @@ def get_color_averages(img,totpixels):
 
     return((average_red, average_green, average_blue))
 
+def scan_screen(sample_x,sample_y):
+    totpixels = sample_x * sample_y
+
+    with mss() as sct: image_file = sct.shot() # take screenshot
+    img_org = Image.open(image_file) # open image in python
+    width_org, height_org = img_org.size
+
+    width = int(width_org * factor)
+    height = int(height_org * factor)
+
+    img = img_org.resize((width, height), Image.NEAREST) # quickest down-sizing filter
+
+    t1 = time.process_time()
+    # let PIL shrink the image into a more manageable size
+    # (just few ms on the average machine)
+    resized_img = img.resize((sample_x, sample_y))
+
+    average_red, average_green, average_blue = get_color_averages(resized_img,totpixels)
+
+    t2 = time.process_time()
+
+    print("\rRGB {:.1f} {:.1f} {:.1f}".format(average_red, average_green, average_blue))
+    print("- Time {}".format(t2-t1))
+
+    return((average_red, average_green, average_blue))
+
 def main():
     # start with the LIFX business...
     lifx = return_interface(None)
@@ -66,34 +92,13 @@ def main():
     # the block of data to analyze.
     # PIL resizing to 1x1 seems to do strange things; a bigger box works better
     # and still plenty fast...
-    rx = int(1920/30)
-    ry = int(1080/30)
-    totpixels = rx * ry
+    sample_x = int(1920/30)
+    sample_y = int(1080/30)
+
 
     # screen scanning loop
     while True:
-
-        with mss() as sct: image_file = sct.shot() # take screenshot
-        img_org = Image.open(image_file) # open image in python
-        width_org, height_org = img_org.size
-
-        width = int(width_org * factor)
-        height = int(height_org * factor)
-
-        img = img_org.resize((width, height), Image.NEAREST) # quickest down-sizing filter
-
-        t1 = time.process_time()
-        # let PIL shrink the image into a more manageable size
-        # (just few ms on the average machine)
-        resized_img = img.resize((rx, ry))
-
-        average_red, average_green, average_blue = get_color_averages(resized_img,totpixels)
-
-        t2 = time.process_time()
-
-        print("\rRGB {:.1f} {:.1f} {:.1f}".format(average_red, average_green, average_blue))
-        print("- Time {}".format(t2-t1))
-
+        average_red, average_green, average_blue = scan_screen(sample_x,sample_y)
         h, s, v = rgb2hsv(average_red, average_green, average_blue)
         color = (h, s, v, 5500)
         for light in lights:

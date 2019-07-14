@@ -18,7 +18,7 @@ fade_modes = {'game': 0, 'movie': 150}
 
 # preferences
 factor = 0.75
-fade_mode = fade_modes['game']
+fade_mode = fade_modes['movie']
 
 # split image filename into name and extension
 #name, ext = os.path.splitext(image_file)

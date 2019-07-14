@@ -90,19 +90,13 @@ def scan_screen(sample_x,sample_y):
     return((average_red, average_green, average_blue))
 
 def main():
-    # start with the LIFX business...
-    lifx = return_interface(None)
-    lights = get_lights(lifx)
-    list_lights(lights)
-
+    '''main function for scanning screen colors and applying color average to lifx lights'''
     # the block of data to analyze.
     # PIL resizing to 1x1 seems to do strange things; a bigger box works better
     # and still plenty fast...
     sample_x = int(1920/30)
     sample_y = int(1080/30)
 
-
-    # screen scanning loop
     while True:
         average_red, average_green, average_blue = scan_screen(sample_x,sample_y)
         h, s, v = rgb2hsv(average_red, average_green, average_blue)
@@ -111,6 +105,12 @@ def main():
             light.set_color(color,fade_mode,rapid=True)
 
         sleep(1/60)
+
+# get lifx interface and lights
+lifx = return_interface(None)
+lights = get_lights(lifx)
+list_lights(lights)
+managedLights = create_managed_lights(lights)
 
 if __name__ == '__main__':
     try:

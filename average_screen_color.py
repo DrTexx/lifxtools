@@ -13,8 +13,12 @@ from mss import mss
 from PIL import Image
 import time, os, colorsys
 
+# static options
+fade_modes{'game': 0, 'movie': 150}
+
 # preferences
 factor = 0.75
+fade_mode = fade_modes['game']
 
 # split image filename into name and extension
 #name, ext = os.path.splitext(image_file)
@@ -92,7 +96,7 @@ def main():
         h, s, v = rgb2hsv(average_red, average_green, average_blue)
         color = (h, s, v, 5500)
         for light in lights:
-            light.set_color(color,rapid=True)
+            light.set_color(color,fade_mode,rapid=True)
 
         time.sleep(1/60)
 

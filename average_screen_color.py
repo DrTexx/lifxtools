@@ -19,7 +19,7 @@ fade_modes = {'game': 0, 'movie': 150, 'desktop': 300, 'slow': 1000, 'super-slow
 
 # preferences
 factor = 0.75
-fade_mode = fade_modes['slow']
+fade_mode = fade_modes['desktop'] # default:'desktop'
 monitor_color_temp = 3000 # normal:5500, NightLightMode:3000
 
 # split image filename into name and extension

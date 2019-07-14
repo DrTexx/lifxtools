@@ -8,7 +8,7 @@
 # programs such as Flux or other 'Night Light' alternatives may impact colours.
 # I can confirm this is the case for Night Light in the Gnome flavour of Debian 10 Buster.
 
-from lifxtools import return_interface, get_lights, list_lights
+from lifxtools import return_interface, get_lights, list_lights, blink_light, managedLight
 from mss import mss
 from PIL import Image
 import time, os, colorsys
@@ -28,9 +28,9 @@ fade_mode = fade_modes['desktop']
 #img_anti.save(new_image_file)
 #print("resized file saved as %s" % new_image_file)
 
-def create_managed_lights():
+def create_managed_lights(_lights):
     _managedLights = []
-    for light in lights:
+    for light in _lights:
         _managedLights.append(managedLight(light))
     return(_managedLights)
 
@@ -113,6 +113,13 @@ def main():
 
 if __name__ == '__main__':
     try:
+        for ml in managedLights:
+            ml.ssave()
+            ml.light.set_power(True)
+            # blink_light(ml.light)
         main()
     finally:
-        print("goodbye")
+        sleep(0.3)
+        for ml in managedLights:
+            # blink_light(ml.light)
+            ml.sload()

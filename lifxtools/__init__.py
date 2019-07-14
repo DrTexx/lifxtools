@@ -66,3 +66,8 @@ def list_lights(_lights):
 
 def get_light_color(_light): return(_light.get_color())
 def get_light_brightness(_light): return(get_light_color(_light)[2])
+def blink_light(_light,delay=1):
+    _light.set_power(False,rapid=True)
+    sleep(delay)
+    _light.set_power(True,rapid=True)
+

@@ -9,4 +9,4 @@ _[NOTE]: This readme is a work-in-progress. If you require any specific informat
 Intergration for multiple public transport APIs. This will involve making a package to translate multiple APIs to the general format (which is likely object-based)
 
 Planned APIs to intergrate:
-- PTV
+- PTV (Public Transport Victoria)

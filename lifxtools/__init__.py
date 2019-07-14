@@ -61,5 +61,8 @@ def set_light_color(_light,color):
     _light.set_color(color)
     if (debug==True): print("{} color set to {}".format(_light.get_label(),color))
 
+def list_lights(_lights):
+    for light in _lights: print("[{}] power:{} color:{} infrared:{}".format(light.get_label(), light.get_power(), light.get_color(), light.get_infrared()))
+
 def get_light_color(_light): return(_light.get_color())
 def get_light_brightness(_light): return(get_light_color(_light)[2])

@@ -12,7 +12,7 @@ script_requirements = ["bitstring==3.1.6",
                        "pkg-resources==0.0.0"]
 readme_filename = 'README.md'
 readme_encoding = 'utf-8'
-script_version = '0.1.0'
+script_version = '0.2.0'
 script_description = 'Graphical interface for controlling lifx bulbs'
 github_username = 'DrTexxOfficial'
 script_author = 'Denver P'

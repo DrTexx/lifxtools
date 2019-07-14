@@ -13,3 +13,12 @@ Intergration for multiple public transport APIs. This will involve making a pack
 
 Planned APIs to intergrate:
 - PTV (Public Transport Victoria)
+
+### Better colours for "Dusk and Dawn" lifx bulbs
+The plan:
+
+| color condition | effect        |
+| ---             | ---           |
+| blue > red      | cooler light  |
+| blue == red     | neutral light |
+| blue < red      | warmer light  |

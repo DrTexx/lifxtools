@@ -69,14 +69,13 @@ def scan_screen(sample_x,sample_y):
 
     img = img_org.resize((width, height), Image.NEAREST) # quickest down-sizing filter
 
-    t1 = time.process_time()
-    # let PIL shrink the image into a more manageable size
-    # (just few ms on the average machine)
-    resized_img = img.resize((sample_x, sample_y))
+    t1 = time.process_time() # take first snapshot of processing time
 
-    average_red, average_green, average_blue = get_color_averages(resized_img,totpixels)
+    resized_img = img.resize((sample_x, sample_y)) # Shrink the image to a more manageable size with PIL
+                                                   # (just a few ms on the average machine)
+    average_red, average_green, average_blue = get_color_averages(resized_img,totpixels) # get the averages of each color in the image
 
-    t2 = time.process_time()
+    t2 = time.process_time() # take second snapshot of processing time
 
     print("\rRGB {:.1f} {:.1f} {:.1f}".format(average_red, average_green, average_blue))
     print("- Time {}".format(t2-t1))

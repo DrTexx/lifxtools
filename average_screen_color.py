@@ -76,7 +76,7 @@ def main():
         h, s, v = rgb2hsv(red, green, blue)
         color = (h, s, v, 5500)
         for light in lights:
-            light.set_color(color)
+            light.set_color(color,15,rapid=True)
 
         time.sleep(1/60)
 

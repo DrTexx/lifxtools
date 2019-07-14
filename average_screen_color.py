@@ -76,7 +76,7 @@ def scan_screen(sample_x,sample_y):
 
     img = img_org.resize((width, height), Image.NEAREST) # quickest down-sizing filter
 
-    t1 = time.process_time() # take first snapshot of processing time
+    t1 = process_time() # take first snapshot of processing time
 
     resized_img = img.resize((sample_x, sample_y)) # Shrink the image to a more manageable size with PIL
                                                    # (just a few ms on the average machine)

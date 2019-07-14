@@ -4,6 +4,10 @@
 # based on the excellent LifxLAN library https://github.com/mclarkk/lifxlan
 # adapted to python3 and improved upon from the screenlifx example script https://github.com/MarcoPon/screenlifx
 
+# note:
+# programs such as Flux or other 'Night Light' alternatives may impact colours.
+# I can confirm this is the case for Night Light in the Gnome flavour of Debian 10 Buster.
+
 from lifxtools import return_interface, get_lights, list_lights
 from mss import mss
 from PIL import Image

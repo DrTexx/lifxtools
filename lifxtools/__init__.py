@@ -17,7 +17,7 @@ live_data = True
 debug = True
 
 # functions
-def return_interface(debug=False):
+def return_interface(num_lights,debug=False):
 
     try:
         if (debug == True): print("[ light discovery ] starting...")

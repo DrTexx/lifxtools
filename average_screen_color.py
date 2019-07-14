@@ -32,6 +32,26 @@ def rgb2hsv(r, g, b):
     v = v * 0xffff
     return(h, s, v)
 
+def get_color_averages(img,totpixels):
+    total_red = total_green = total_blue = 0
+    for y in range(0, img.size[1]):
+        for x in range(0, img.size[0]):
+            pixel = img.getpixel((x,y))
+
+            pixel_RED = pixel[0]
+            pixel_GREEN = pixel[1]
+            pixel_BLUE = pixel[2]
+
+            total_red += pixel_RED
+            total_green += pixel_GREEN
+            total_blue += pixel_BLUE
+
+            average_red = total_red / totpixels
+            average_green = total_green / totpixels
+            average_blue = total_blue / totpixels
+
+    return((average_red, average_green, average_blue))
+
 def main():
     # start with the LIFX business...
     lifx = return_interface(None)
@@ -60,24 +80,16 @@ def main():
         t1 = time.process_time()
         # let PIL shrink the image into a more manageable size
         # (just few ms on the average machine)
-        img = img.resize((rx, ry))
-        red = green = blue = 0
-        for y in range(0, img.size[1]):
-            for x in range(0, img.size[0]):
-                c = img.getpixel((x,y))
-                print(c)
-                red = red + c[0]
-                green = green + c[1]
-                blue = blue + c[2]
-        red = red / totpixels
-        green = green / totpixels
-        blue = blue / totpixels
+        resized_img = img.resize((rx, ry))
+
+        average_red, average_green, average_blue = get_color_averages(resized_img,totpixels)
+
         t2 = time.process_time()
 
-        print("\rRGB {:.1f} {:.1f} {:.1f}".format(red, green, blue))
+        print("\rRGB {:.1f} {:.1f} {:.1f}".format(average_red, average_green, average_blue))
         print("- Time {}".format(t2-t1))
 
-        h, s, v = rgb2hsv(red, green, blue)
+        h, s, v = rgb2hsv(average_red, average_green, average_blue)
         color = (h, s, v, 5500)
         for light in lights:
             light.set_color(color,rapid=True)

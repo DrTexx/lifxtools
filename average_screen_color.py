@@ -15,7 +15,7 @@ from time import sleep, process_time
 from colorsys import rgb_to_hsv
 
 # static options
-fade_modes = {'game': 0, 'movie': 150, 'desktop': 300, 'slow': 1000}
+fade_modes = {'game': 0, 'movie': 150, 'desktop': 300, 'slow': 1000, 'super-slow': 2000, 'ultra-slow': 5000}
 
 # preferences
 factor = 0.75

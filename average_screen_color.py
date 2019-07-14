@@ -15,11 +15,11 @@ from time import sleep, process_time
 from colorsys import rgb_to_hsv
 
 # static options
-fade_modes = {'game': 0, 'movie': 150, 'desktop': 300}
+fade_modes = {'game': 0, 'movie': 150, 'desktop': 300, 'slow': 1000}
 
 # preferences
 factor = 0.75
-fade_mode = fade_modes['desktop']
+fade_mode = fade_modes['slow']
 
 # split image filename into name and extension
 #name, ext = os.path.splitext(image_file)

@@ -21,6 +21,7 @@ fade_modes = {'game': 0, 'movie': 150, 'desktop': 300, 'slow': 1000, 'super-slow
 factor = 0.75
 fade_mode = fade_modes['desktop'] # default:'desktop'
 monitor_color_temp = 3000 # normal:5500, NightLightMode:3000
+max_brightness = 100 # default:100
 
 # split image filename into name and extension
 #name, ext = os.path.splitext(image_file)
@@ -101,7 +102,7 @@ def main():
     while True:
         average_red, average_green, average_blue = scan_screen(sample_x,sample_y)
         h, s, v = rgb2hsv(average_red, average_green, average_blue)
-        color = (h, s, v, monitor_color_temp)
+        color = (h, s, v*(max_brightness/100), monitor_color_temp)
         for light in lights:
             light.set_color(color,fade_mode,rapid=True)
 

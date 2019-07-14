@@ -11,7 +11,8 @@
 from lifxtools import return_interface, get_lights, list_lights, blink_light, managedLight
 from mss import mss
 from PIL import Image
-import time, os, colorsys
+from time import sleep, process_time
+from colorsys import rgb_to_hsv
 
 # static options
 fade_modes = {'game': 0, 'movie': 150, 'desktop': 300}
@@ -36,7 +37,7 @@ def create_managed_lights(_lights):
 
 def rgb2hsv(r, g, b):
     ''' helper for colors conversion/scaling '''
-    h, s, v = colorsys.rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)
+    h, s, v = rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)
     h = h * 0xffff
     s = s * 0xffff
     v = v * 0xffff
@@ -81,7 +82,7 @@ def scan_screen(sample_x,sample_y):
                                                    # (just a few ms on the average machine)
     average_red, average_green, average_blue = get_color_averages(resized_img,totpixels) # get the averages of each color in the image
 
-    t2 = time.process_time() # take second snapshot of processing time
+    t2 = process_time() # take second snapshot of processing time
 
     print("\rRGB {:.1f} {:.1f} {:.1f}".format(average_red, average_green, average_blue))
     print("- Time {}".format(t2-t1))
@@ -109,7 +110,7 @@ def main():
         for light in lights:
             light.set_color(color,fade_mode,rapid=True)
 
-        time.sleep(1/60)
+        sleep(1/60)
 
 if __name__ == '__main__':
     try:

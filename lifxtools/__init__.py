@@ -86,3 +86,15 @@ def blink_light(_light,delay=1):
     sleep(delay)
     _light.set_power(True,rapid=True)
 
+def get_lights(_interface,debug=False):
+
+    try:
+        if (debug == True): print("[ get lights ] started...")
+        return(_interface.get_lights())
+
+    except:
+        if (debug == True): print("[ get lights ] ERROR!")
+
+    finally:
+        if (debug == True): print("[ get lights ] finished!")
+

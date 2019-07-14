@@ -5,7 +5,7 @@ https://github.com/pypa/sampleproject
 """
 
 
-script_name = 'lifx-tools'
+script_name = 'lifxtools'
 script_requirements = ["bitstring==3.1.6",
                        "lifxlan==1.2.5",
                        "netifaces==0.10.9",

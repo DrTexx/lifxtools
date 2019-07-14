@@ -5,7 +5,9 @@
 _[NOTE]: This readme is a work-in-progress. If you require any specific information, please submit a github issue. I will try my best to address any questions you have in this readme once I get the chance. Thanks! :)_
 
 ## Notable usages
-- Stanley Kubrick's A Clockwork Orange is well enhanced by the effect of average_screen_color.py; first few minutes of the film are of particularly strong effect.
+### average_screen_color.py
+(Ultra-slow fade mode)
+Stanley Kubrick's A Clockwork Orange is well enhanced by the effect of average_screen_color.py; first few minutes of the film are of particularly strong effect.
 
 ## Todo
 ### Public Transport API Intergration

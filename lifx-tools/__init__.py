@@ -1,3 +1,0 @@
-'''
-lifx-tools module
-'''

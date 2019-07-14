@@ -18,9 +18,18 @@ debug = True
 
 # functions
 def return_interface(debug=False):
-    if (debug == True): print("Discovering lights...")
-    if (num_lights != None): print("WARNING: num_lights is not None. Make sure it is set to your actual number of devices or you will likely have issues!")
-    return(LifxLAN(num_lights))
+
+    try:
+        if (debug == True): print("[ light discovery ] starting...")
+        if (num_lights != None): print("WARNING: num_lights is not None. Make sure it is set to your actual number of devices or you will likely have issues!")
+        lifx = LifxLAN(num_lights)
+        return(lifx)
+
+    except:
+        raise Error("[ light discovery ] ERROR!")
+
+    finally:
+        if (debug == True): print("[ light discovery ] finished!")
 
 def return_num_lights(devices):
     if (num_lights != None):

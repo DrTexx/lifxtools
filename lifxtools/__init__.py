@@ -17,8 +17,8 @@ live_data = True
 debug = True
 
 # functions
-def return_interface():
-    print("Discovering lights...")
+def return_interface(debug=False):
+    if (debug == True): print("Discovering lights...")
     if (num_lights != None): print("WARNING: num_lights is not None. Make sure it is set to your actual number of devices or you will likely have issues!")
     return(LifxLAN(num_lights))
 

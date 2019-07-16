@@ -22,6 +22,7 @@ factor = 0.75
 fade_mode = fade_modes['desktop'] # default:'desktop'
 monitor_color_temp = 3000 # normal:5500, NightLightMode:3000
 max_brightness = 100 # default:100
+selected_monitor = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: secondary only, etc.
 
 # split image filename into name and extension
 #name, ext = os.path.splitext(image_file)
@@ -69,8 +70,10 @@ def get_color_averages(img,totpixels):
 def scan_screen(sample_x,sample_y):
     totpixels = sample_x * sample_y
 
-    with mss() as sct: image_file = sct.shot() # take screenshot
-    img_org = Image.open(image_file) # open image in python
+    with mss() as sct:
+#        for num, monitor in enumerate(sct.monitors[1:], 1): # Get rid of the first, as it represents the "All in One" monitor
+        sct_img = sct.grab(sct.monitors[selected_monitor]) # Get raw pixels from the screen
+        img_org = Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX") # Create the Image
     width_org, height_org = img_org.size
 
     width = int(width_org * factor)

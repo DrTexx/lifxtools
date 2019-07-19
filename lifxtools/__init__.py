@@ -115,8 +115,8 @@ class managedLight:
 
     def sload(self):
         '''load light state last saved inside of class'''
-        self.light.set_power(self.power)
         self.light.set_color(self.color)
+        self.light.set_power(self.power)
         #self.light.set_infrared(self.infrared)
 
     def sexport(self):

@@ -16,6 +16,15 @@ bedtime_color = (58275, 0, 18010, 2000) # roughly 25% brightness at 2000k
 live_data = True
 debug = True
 
+# decorators
+def d_benchmark(func):
+    def func_wrapper(*args,**kwargs):
+        t1 = process_time() # take first snapshot of processing time
+        result = func(*args,**kwargs)
+        t2 = process_time() # take second snapshot of processing time
+        print("[{}] took {} seconds to complete!".format(func.__name__, t2-t1))
+        return(result)
+    return func_wrapper
 
 # functions
 #@d_debug_messages

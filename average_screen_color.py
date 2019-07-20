@@ -11,7 +11,7 @@
 from lifxtools import return_interface, get_lights, list_lights, blink_light, managedLight, d_benchmark
 from mss import mss
 from PIL import Image
-from time import sleep, process_time
+from time import sleep
 from colorsys import rgb_to_hsv
 
 # static options

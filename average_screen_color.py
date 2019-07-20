@@ -32,6 +32,7 @@ selected_monitor = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: sec
 #img_anti.save(new_image_file)
 #print("resized file saved as %s" % new_image_file)
 
+# functions
 def create_managed_lights(_lights):
     _managedLights = []
     for light in _lights:

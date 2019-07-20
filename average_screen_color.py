@@ -22,7 +22,7 @@ factor = 0.75
 fade_mode = fade_modes['game'] # default:'desktop'
 monitor_color_temp = 5500 # normal:5500, NightLightMode:3000
 max_brightness = 100 # default:100
-selected_monitor = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: secondary only, etc.
+monitor_num = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: secondary only, etc.
 
 # split image filename into name and extension
 #name, ext = os.path.splitext(image_file)
@@ -68,27 +68,37 @@ def get_color_averages(img,totpixels):
 
     return((average_red, average_green, average_blue))
 
-@d_benchmark
-def scan_screen(sample_x,sample_y,totpixels):
-
+def return_screengrab(_monitor_num):
     with mss() as sct:
-#        for num, monitor in enumerate(sct.monitors[1:], 1): # Get rid of the first, as it represents the "All in One" monitor
-        sct_img = sct.grab(sct.monitors[selected_monitor]) # Get raw pixels from the screen
-        img_org = Image.frombytes("RGB", sct_img.size, sct_img.bgra, "raw", "BGRX") # Create the Image
-    width_org, height_org = img_org.size
+        monitors = sct.monitors[_monitor_num] # get monitor object
+        img_raw = sct.grab(monitors) # get raw pixels from the selected monitor
+        _img = Image.frombytes("RGB", img_raw.size, img_raw.bgra, "raw", "BGRX") # create an image from raw pixels
+        return(_img)
 
-    width = int(width_org * factor)
-    height = int(height_org * factor)
+def return_new_dimensions(_img,factor):
+    og_width, og_height = _img.size
+    width = int(og_width * factor)
+    height = int(og_height * factor)
+    return((width,height))
 
-    img = img_org.resize((width, height), Image.NEAREST) # quickest down-sizing filter
-
-    resized_img = img.resize((sample_x, sample_y)) # Shrink the image to a more manageable size with PIL
-                                                   # (just a few ms on the average machine)
-    average_red, average_green, average_blue = get_color_averages(resized_img,totpixels) # get the averages of each color in the image
-
-    print("\rRGB {:.1f} {:.1f} {:.1f}".format(average_red, average_green, average_blue))
+def scan_screen(sample_x,sample_y,totpixels):
+    img = return_screengrab(monitor_num)
+    resized_img = img.resize(return_new_dimensions(img,factor), Image.NEAREST)
+    shrunk_img = resized_img.resize((sample_x, sample_y)) # Shrink the image to a more manageable size with PIL (just a few ms on the average machine)
+    average_red, average_green, average_blue = get_color_averages(shrunk_img,totpixels) # get the averages of each color in the image
+    print("({:.1f},{:.1f},{:.1f})".format(average_red, average_green, average_blue))
 
     return((average_red, average_green, average_blue))
+
+@d_benchmark
+def main_loop(sample_x,sample_y,totpixels):
+    average_red, average_green, average_blue = scan_screen(sample_x,sample_y,totpixels)
+    h, s, v = rgb2hsv(average_red, average_green, average_blue)
+    color = (h, s, v*(max_brightness/100), monitor_color_temp)
+    for light in lights:
+        light.set_color(color,fade_mode,rapid=True)
+
+    sleep(1/60)
 
 def main():
     '''main function for scanning screen colors and applying color average to lifx lights'''
@@ -98,15 +108,8 @@ def main():
     sample_x = int(1920/30)
     sample_y = int(1080/30)
     totpixels = sample_x * sample_y
-
     while True:
-        average_red, average_green, average_blue = scan_screen(sample_x,sample_y,totpixels)
-        h, s, v = rgb2hsv(average_red, average_green, average_blue)
-        color = (h, s, v*(max_brightness/100), monitor_color_temp)
-        for light in lights:
-            light.set_color(color,fade_mode,rapid=True)
-
-        sleep(1/60)
+        main_loop(sample_x,sample_y,totpixels)
 
 # get lifx interface and lights
 lifx = return_interface(None)

@@ -6,7 +6,7 @@ print("lifxtools/__init__.py")
 # imports
 from tkinter import * # for UI
 from tkinter.ttk import * # for not ugly UI
-from time import sleep # used for delays
+from time import sleep, process_time # used for delays
 from lifxlan import LifxLAN, RED, WHITE # used for controlling lights
 
 # settings
@@ -16,20 +16,13 @@ bedtime_color = (58275, 0, 18010, 2000) # roughly 25% brightness at 2000k
 live_data = True
 debug = True
 
+
 # functions
-def return_interface(num_lights,debug=False):
-
-    try:
-        if (debug == True): print("[ light discovery ] starting...")
-        if (num_lights != None): print("WARNING: num_lights is not None. Make sure it is set to your actual number of devices or you will likely have issues!")
-        lifx = LifxLAN(num_lights)
-        return(lifx)
-
-    except:
-        raise Error("[ light discovery ] ERROR!")
-
-    finally:
-        if (debug == True): print("[ light discovery ] finished!")
+#@d_debug_messages
+def return_interface(num_lights):
+    if (num_lights != None): print("WARNING: num_lights is not None. Make sure it is set to your actual number of devices or you will likely have issues!")
+    lifx = LifxLAN(num_lights)
+    return(lifx)
 
 def return_num_lights(devices):
     if (num_lights != None):

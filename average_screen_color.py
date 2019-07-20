@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-
-# change all lifx globes to an average of the colors on-screen
+'''
+change all lifx globes to the on-screen color average of a monitor/s of your choice
+'''
 # based on the excellent LifxLAN library https://github.com/mclarkk/lifxlan
 # adapted to python3 and improved upon from the screenlifx example script https://github.com/MarcoPon/screenlifx
 
@@ -23,14 +24,6 @@ fade_mode = fade_modes['game'] # default:'desktop'
 monitor_color_temp = 5500 # normal:5500, NightLightMode:3000
 max_brightness = 100 # default:100
 monitor_num = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: secondary only, etc.
-
-# split image filename into name and extension
-#name, ext = os.path.splitext(image_file)
-
-# create a new file name for saving the result
-#new_image_file = "%s%s%s" % (name, str(factor), ext)
-#img_anti.save(new_image_file)
-#print("resized file saved as %s" % new_image_file)
 
 # functions
 def create_managed_lights(_lights):

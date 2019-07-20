@@ -8,7 +8,7 @@
 # programs such as Flux or other 'Night Light' alternatives may impact colours.
 # I can confirm this is the case for Night Light in the Gnome flavour of Debian 10 Buster.
 
-from lifxtools import return_interface, get_lights, list_lights, blink_light, managedLight
+from lifxtools import return_interface, get_lights, list_lights, blink_light, managedLight, d_benchmark
 from mss import mss
 from PIL import Image
 from time import sleep, process_time
@@ -67,6 +67,7 @@ def get_color_averages(img,totpixels):
 
     return((average_red, average_green, average_blue))
 
+@d_benchmark
 def scan_screen(sample_x,sample_y):
     totpixels = sample_x * sample_y
 
@@ -81,16 +82,11 @@ def scan_screen(sample_x,sample_y):
 
     img = img_org.resize((width, height), Image.NEAREST) # quickest down-sizing filter
 
-    t1 = process_time() # take first snapshot of processing time
-
     resized_img = img.resize((sample_x, sample_y)) # Shrink the image to a more manageable size with PIL
                                                    # (just a few ms on the average machine)
     average_red, average_green, average_blue = get_color_averages(resized_img,totpixels) # get the averages of each color in the image
 
-    t2 = process_time() # take second snapshot of processing time
-
     print("\rRGB {:.1f} {:.1f} {:.1f}".format(average_red, average_green, average_blue))
-    print("- Time {}".format(t2-t1))
 
     return((average_red, average_green, average_blue))
 

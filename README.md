@@ -12,6 +12,9 @@ Stanley Kubrick's A Clockwork Orange is well enhanced by the effect of average_s
 (Slow fade mode)
 Blade Runner (1997). Movie full of both muted and vibrant tones. Takes full advantage of the vividness of the colour of lifx bulbs
 
+(Game fade mode)
+Half-Life 2: Episode 1. The first few levels of this game are truly awesome with live colour averages.
+
 ## Todo
 ### Public Transport API Intergration
 Intergration for multiple public transport APIs. This will involve making a package to translate multiple APIs to the general format (which is likely object-based)

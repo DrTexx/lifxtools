@@ -26,8 +26,19 @@ def d_benchmark(func):
         return(result)
     return func_wrapper
 
+def d_debug_messages(func):
+    def func_wrapper(*args,**kwargs):
+        if (debug==True): print("[{}] started...".format(func.__name__))
+        try:
+            return func(*args,**kwargs)
+        except Exception as err:
+            print("[{}] ERROR!: {}".format(func.__name__, err))
+        finally:
+            if (debug==True): print("[{}] finished!".format(func.__name__))
+    return(func_wrapper)
+
 # functions
-#@d_debug_messages
+@d_debug_messages
 def return_interface(num_lights):
     if (num_lights != None): print("WARNING: num_lights is not None. Make sure it is set to your actual number of devices or you will likely have issues!")
     lifx = LifxLAN(num_lights)
@@ -72,7 +83,7 @@ def set_light_color(_light,color):
     _light.set_color(color)
     if (debug==True): print("{} color set to {}".format(_light.get_label(),color))
 
-#@d_debug_messages
+@d_debug_messages
 def list_lights(_lights):
     for light in _lights:
         print("[{}] power:{} color:{} infrared:{}".format(light.get_label(), light.get_power(), light.get_color(), light.get_infrared()))
@@ -96,6 +107,7 @@ def get_lights(_interface,debug=False):
     finally:
         if (debug == True): print("[ get lights ] finished!")
 
+@d_debug_messages
 class managedLight:
 
     def __init__(self,_light,debug=False):

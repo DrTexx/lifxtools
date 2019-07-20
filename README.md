@@ -30,3 +30,6 @@ The plan:
 
 ### Add preferences for monitor refresh related
 With the addition of benchmarking capabilities available to the user, this will allow users to compare their color average processing time with the refresh rate of their displays. Ideally, this number should be as close to matching as possible (with consideration for network speed also)
+
+### Don't send packets if colour is identical to last sent colour
+This has the intention of saving network bandwidth (and potenially a small amount of processing time)

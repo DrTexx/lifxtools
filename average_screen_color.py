@@ -68,8 +68,7 @@ def get_color_averages(img,totpixels):
     return((average_red, average_green, average_blue))
 
 @d_benchmark
-def scan_screen(sample_x,sample_y):
-    totpixels = sample_x * sample_y
+def scan_screen(sample_x,sample_y,totpixels):
 
     with mss() as sct:
 #        for num, monitor in enumerate(sct.monitors[1:], 1): # Get rid of the first, as it represents the "All in One" monitor
@@ -97,9 +96,10 @@ def main():
     # and still plenty fast...
     sample_x = int(1920/30)
     sample_y = int(1080/30)
+    totpixels = sample_x * sample_y
 
     while True:
-        average_red, average_green, average_blue = scan_screen(sample_x,sample_y)
+        average_red, average_green, average_blue = scan_screen(sample_x,sample_y,totpixels)
         h, s, v = rgb2hsv(average_red, average_green, average_blue)
         color = (h, s, v*(max_brightness/100), monitor_color_temp)
         for light in lights:

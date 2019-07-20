@@ -21,7 +21,7 @@ fade_modes = {'game': 0, 'smooth': 5, 'movie': 150, 'desktop': 300, 'slow': 1000
 # preferences
 factor = 0.75
 fade_mode = fade_modes['game'] # default:'desktop'
-monitor_color_temp = 5500 # normal:5500, NightLightMode:3000
+monitor_color_temp = 6500 # normal:6500, NightLightMode:3000 (in Kelvin)
 max_brightness = 100 # default:100
 monitor_num = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: secondary only, etc.
 

@@ -55,9 +55,9 @@ def get_color_averages(img,totpixels):
             total_green += pixel_GREEN
             total_blue += pixel_BLUE
 
-            average_red = total_red / totpixels
-            average_green = total_green / totpixels
-            average_blue = total_blue / totpixels
+    red = total_red / _totpixels
+    green = total_green / _totpixels
+    blue = total_blue / _totpixels
 
     return((average_red, average_green, average_blue))
 

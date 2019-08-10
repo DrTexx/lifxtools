@@ -19,7 +19,7 @@ from colorsys import rgb_to_hsv
 fade_modes = {'game': 0, 'smooth': 5, 'movie': 150, 'desktop': 300, 'slow': 1000, 'super-slow': 2000, 'ultra-slow': 5000}
 
 # preferences
-factor = 0.75
+factor = 1 # 1: good PC performance, 0.75: average PC performance (may cause colour artifacting)
 fade_mode = fade_modes['game'] # default:'desktop'
 monitor_color_temp = 6500 # normal:6500, NightLightMode:3000 (in Kelvin)
 max_brightness = 100 # default:100

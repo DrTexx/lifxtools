@@ -17,11 +17,12 @@ from colorsys import rgb_to_hsv
 
 # static options
 fade_modes = {'game': 0, 'smooth': 5, 'movie': 150, 'desktop': 300, 'slow': 1000, 'super-slow': 2000, 'ultra-slow': 5000}
+monitor_color_temps = {'default': 6500, 'nightLight': 4000} # always match monitor colour tempreture to this setting (in kelvin)
 
 # preferences
 factor = 1 # 1: good PC performance, 0.75: average PC performance (may cause colour artifacting)
 fade_mode = fade_modes['game'] # default:'desktop'
-monitor_color_temp = 6500 # normal:6500, NightLightMode:3000 (in Kelvin)
+monitor_color_temp = monitor_color_temps['default']
 max_brightness = 100 # default:100
 monitor_num = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: secondary only, etc.
 

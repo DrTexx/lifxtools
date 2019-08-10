@@ -35,12 +35,12 @@ def rgb2hsv(r, g, b):
     v = v * 0xffff
     return(h, s, v)
 
-def get_color_averages(img,totpixels):
-    '''get averages of colors in image'''
+def normal_scan(_img,_totpixels):
+    '''returns the color average for the entire screen'''
     total_red = total_green = total_blue = 0
-    for y in range(0, img.size[1]):
-        for x in range(0, img.size[0]):
-            pixel = img.getpixel((x,y))
+    for y in range(0, _img.size[1]):
+        for x in range(0, _img.size[0]):
+            pixel = _img.getpixel((x,y))
 
             pixel_RED = pixel[0]
             pixel_GREEN = pixel[1]
@@ -54,7 +54,52 @@ def get_color_averages(img,totpixels):
     green = total_green / _totpixels
     blue = total_blue / _totpixels
 
-    return((average_red, average_green, average_blue))
+    return((red, green, blue))
+
+def FPS_scan(_img,_totpixels,start_perc=0.25,end_perc=0.75):
+    ''' only returns the color average for the middle 50% of the screen (vertically and horizontally), also a likely boost in performance but further testing needed'''
+    total_red = total_green = total_blue = 0
+    # get length of y (total monitor width in pixels)
+    y_length = _img.size[1]
+    x_length = _img.size[0]
+
+    y_min = y_length*start_perc
+    y_max = y_length*end_perc
+    y_range = y_max - y_min # new range is the new maximum minus the new minimum
+
+    x_min = x_length*start_perc
+    x_max = x_length*end_perc
+    x_range = x_max - x_min # new range is the new maximum minus the new minimum
+
+    # print("min:{} max:{} range:{}".format(y_min,y_max,y_range))
+
+    for y in range(0,y_length): # for each pixel on why
+
+        if (y > y_min and y < y_max): # if the pixel is in the range
+
+            for x in range(0,x_length): # iterate through x
+
+                if (x > x_min and x < x_max): # if the pixel is in x's range
+
+                    pixel = _img.getpixel((x,y))
+
+                    total_red += pixel[0]
+                    total_green += pixel[1]
+                    total_blue += pixel[2]
+
+    red = total_red / _totpixels
+    green = total_green / _totpixels
+    blue = total_blue / _totpixels
+
+    return((red,green,blue))
+
+    # raise NotImplementedError()
+
+def get_color_averages(img,totpixels):
+    '''get averages of colors in image'''
+    red, green, blue = scan_method(img,totpixels)
+
+    return((red, green, blue))
 
 def return_screengrab(_monitor_num):
     with mss() as sct:
@@ -77,6 +122,12 @@ def scan_screen(sample_x,sample_y,totpixels):
     print("({:.1f},{:.1f},{:.1f})".format(average_red, average_green, average_blue))
 
     return((average_red, average_green, average_blue))
+
+# static options requiring functions
+scan_methods = {'default': normal_scan, 'game-FPS': FPS_scan}
+
+# preferences requiring functions
+scan_method = scan_methods['game-FPS']
 
 @d_benchmark
 def main_loop(sample_x,sample_y,totpixels):

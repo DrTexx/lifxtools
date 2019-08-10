@@ -26,12 +26,6 @@ max_brightness = 100 # default:100
 monitor_num = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: secondary only, etc.
 
 # functions
-def create_managed_lights(_lights):
-    _managedLights = []
-    for light in _lights:
-        _managedLights.append(managedLight(light))
-    return(_managedLights)
-
 def rgb2hsv(r, g, b):
     ''' helper for colors conversion/scaling '''
     h, s, v = rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)

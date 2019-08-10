@@ -140,3 +140,9 @@ class managedLight:
     def print_saved_state(self):
         '''print the saved state of the light'''
         print("[{} (saved)] power:{} color:{} infrared:{}".format(self.light.get_label(), self.power, self.color, self.infrared))
+
+def create_managed_lights(_lights):
+    _managedLights = []
+    for light in _lights:
+        _managedLights.append(managedLight(light))
+    return(_managedLights)

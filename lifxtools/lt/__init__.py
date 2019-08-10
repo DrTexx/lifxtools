@@ -8,12 +8,12 @@ print("lifxtools/lt/__init__.py")
 from lifxtools import *
 
 # settings
+num_lights = None
 debug = True
 
 def start():
-    lifx = return_interface(debug=debug)
+    lifx = return_interface(num_lights)
     devices = lifx.get_lights()
-    num_lights = return_num_lights(devices)
     list_devices(devices)
     # blink_devices(devices)
 
@@ -43,16 +43,16 @@ def start():
             test_text = Label(test_frame,text="Lights discovered")
             test_text.pack()
 
-            self.light_settings = []
-            i = 0
+            self.light_settings = {}
             for device in devices:
-                self.light_settings.append({'device': device, 'frame': Frame(test_frame)}) # add frames and all relevant things here
+                dev_label = str(device.get_label())
+                self.light_settings[dev_label] = {'device': device, 'frame': Frame(test_frame)} # add frames and all relevant things here
                 # configure frames and relevant items here
-                self.light_settings[i]['frame'].config(padding=5,relief=SUNKEN)
-                self.light_settings[i]['frame'].pack(fill=X)
+                self.light_settings[dev_label]['frame'].config(padding=5,relief=SUNKEN)
+                self.light_settings[dev_label]['frame'].pack(fill=X)
 
-                _light_device = self.light_settings[i]['device']
-                _light_frame = self.light_settings[i]['frame']
+                _light_device = self.light_settings[dev_label]['device']
+                _light_frame = self.light_settings[dev_label]['frame']
 
                 light_label = Label(_light_frame, text=str(_light_device.get_label()))
                 light_label.pack(side=LEFT)
@@ -64,6 +64,7 @@ def start():
                 # light_brightness.pack(side=LEFT)
 
                 light_profile_default = Button(_light_frame, text="default color", command=lambda: set_light_color(_light_device,default_color))
+                print(_light_device)
                 light_profile_default.pack(side=LEFT)
 
                 light_profile_bedtime = Button(_light_frame, text="bedtime color", command=lambda: set_light_color(_light_device,bedtime_color))
@@ -74,19 +75,15 @@ def start():
 
                 light_profile_red = Button(_light_frame, text="red color", command=lambda: set_light_color(_light_device, RED))
                 light_profile_red.pack(side=LEFT)
-                i += 1
 
             if (debug == True): print(self.light_settings)
-            light0_frame = self.light_settings[0]['frame'] # TEMPORARY UNTIL CODE BELOW MIGRATED TO ITERABLE FORMAT
 
-            self.light0_brightness = Scale(light0_frame, from_=0, to=65535,orient=HORIZONTAL)
-            self.light0_brightness.pack(side=LEFT)
-
-        def _update_brightness(self): self.light0_brightness.set(get_light_brightness(devices[0]))
+#        def _update_brightness(self): self.light0_brightness.set(get_light_brightness(devices[0]))
 
         def _update_loop(self,ms_per_loop=1000):
             if (live_data == True):
-                self._update_brightness()
+                pass
+#                self._update_brightness()
             self.after(ms_per_loop,self._update_loop) # repeat _update_loop()
 
         def _exit_app(self,event):

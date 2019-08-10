@@ -9,7 +9,7 @@ change all lifx globes to the on-screen color average of a monitor/s of your cho
 # programs such as Flux or other 'Night Light' alternatives may impact colours.
 # I can confirm this is the case for Night Light in the Gnome flavour of Debian 10 Buster.
 
-from lifxtools import return_interface, get_lights, list_lights, blink_light, managedLight, d_benchmark
+from lifxtools import return_interface, get_lights, list_lights, blink_light, managedLight, d_benchmark, create_managed_lights
 from mss import mss
 from PIL import Image
 from time import sleep

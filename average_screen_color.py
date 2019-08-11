@@ -46,21 +46,19 @@ def scan_img_average_color(_img):
 
     return((r, g, b))
 
-def FPS_scan(_img,start_perc=0.25,end_perc=0.75):
+def FPS_scan(_img,_monitor_range=(0.25,0.75)):
     ''' only returns the color average for the middle 50% of the screen (vertically and horizontally), also a likely boost in performance but further testing needed'''
     total_red = total_green = total_blue = 0
-    # get length of y (total monitor width in pixels)
+
     y_length = _img.size[1]
     x_length = _img.size[0]
-    print(y_length,x_length)
 
-    y_min = y_length*0.25
-    y_max = y_length*0.75
+    y_min = y_length*_monitor_range[0]
+    y_max = y_length*_monitor_range[1]
     y_range = y_max - y_min # new range is the new maximum minus the new minimum
-    print(y_min,y_max,y_range)
 
-    x_min = x_length*start_perc
-    x_max = x_length*end_perc
+    x_min = x_length*_monitor_range[0]
+    x_max = x_length*_monitor_range[1]
     x_range = x_max - x_min # new range is the new maximum minus the new minimum
 
     total_range = y_range * x_range
@@ -170,7 +168,7 @@ def main():
     managedLights = create_managed_lights(lights)
 
     # the block of data to analyze. PIL resizing to 1x1 seems to do strange things; a bigger box works better (and still plenty fast)
-    mon_sample_scale = 30 # default: 30
+    mon_sample_scale = 15 # default: 30
     sample_size = (int(monitor_w/mon_sample_scale), int(monitor_h/mon_sample_scale))
 
     try:

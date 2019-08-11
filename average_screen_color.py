@@ -9,11 +9,10 @@ change all lifx globes to the on-screen color average of a monitor/s of your cho
 # programs such as Flux or other 'Night Light' alternatives may impact colours.
 # I can confirm this is the case for Night Light in the Gnome flavour of Debian 10 Buster.
 
-from lifxtools import return_interface, get_lights, list_lights, blink_light, managedLight, d_benchmark, create_managed_lights
+from lifxtools import return_interface, get_lights, list_lights, blink_light, managedLight, d_benchmark, create_managed_lights, rgbk2hsvk
 from mss import mss
 from PIL import Image
 from time import sleep
-from colorsys import rgb_to_hsv
 
 # static options
 fade_modes = {'game': 0, 'smooth': 5, 'movie': 150, 'desktop': 300, 'slow': 1000, 'super-slow': 2000, 'ultra-slow': 5000}
@@ -27,14 +26,6 @@ max_brightness = 100 # default:100
 monitor_num = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: secondary only, etc.
 
 # functions
-def rgb2hsv(r, g, b):
-    ''' helper for colors conversion/scaling '''
-    h, s, v = rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)
-    h = h * 0xffff
-    s = s * 0xffff
-    v = v * 0xffff
-    return(h, s, v)
-
 def normal_scan(_img,_totpixels):
     '''returns the color average for the entire screen'''
     total_red = total_green = total_blue = 0
@@ -132,8 +123,8 @@ scan_method = scan_methods['game-FPS']
 @d_benchmark
 def main_loop(sample_x,sample_y,totpixels):
     average_red, average_green, average_blue = scan_screen(sample_x,sample_y,totpixels)
-    h, s, v = rgb2hsv(average_red, average_green, average_blue)
-    color = (h, s, v*(max_brightness/100), monitor_color_temp)
+    h, s, v, k = rgbk2hsvk (average_red, average_green, average_blue, monitor_color_temp)
+    color = (h, s, v*(max_brightness/100), k)
     for light in lights:
         light.set_color(color,fade_mode,rapid=True)
 

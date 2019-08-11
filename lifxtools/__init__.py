@@ -8,6 +8,7 @@ from tkinter import * # for UI
 from tkinter.ttk import * # for not ugly UI
 from time import sleep, process_time # used for delays
 from lifxlan import LifxLAN, RED, WHITE # used for controlling lights
+from colorsys import rgb_to_hsv
 
 # settings
 num_lights = None # makes discovery much faster when specified instead of none
@@ -146,3 +147,12 @@ def create_managed_lights(_lights):
     for light in _lights:
         _managedLights.append(managedLight(light))
     return(_managedLights)
+
+def rgbk2hsvk(r, g, b, k):
+    ''' convert rgb + kelvin to hsvk for bulbs (colors conversion/scaling) '''
+    h, s, v = rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)
+    h = h * 0xffff
+    s = s * 0xffff
+    v = v * 0xffff
+    k = k
+    return(h, s, v, k)

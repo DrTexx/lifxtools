@@ -14,10 +14,6 @@ from mss import mss
 from PIL import Image, ImageFilter
 from time import sleep
 
-# static options
-fade_modes = {'game': 0, 'smooth': 5, 'movie': 150, 'desktop': 300, 'slow': 1000, 'super-slow': 2000, 'ultra-slow': 5000}
-monitor_color_temps = {'default': 6500, 'nightLight': 4000} # always match monitor colour tempreture to this setting (in kelvin)
-
 # functions
 def scan_img_average_color(_img):
     '''returns the color average for the entire screen'''
@@ -196,6 +192,10 @@ def scan_set_loop(_scan_method,_sample_size,_lights,_monitor_num,_factor,_fade_m
 def main():
     '''main function for scanning screen colors and applying color average to lifx lights'''
 
+    # static options
+    fade_modes = {'game': 0, 'smooth': 5, 'movie': 150, 'desktop': 300, 'slow': 1000, 'super-slow': 2000, 'ultra-slow': 5000}
+    monitor_color_temps = {'default': 6500, 'nightLight': 4000} # always match monitor colour tempreture to this setting (in kelvin)
+
     # preferences
     num_lights = 3 # None: slower, automatic detection of all network lights, [integer]: specify number of lights, quicker discovery
     factor = 1 # 1: good PC performance, 0.75: average PC performance (may cause colour artifacting)
@@ -206,7 +206,7 @@ def main():
     monitor_h = 1080
     monitor_sample_scale = 30 # default: 30 (lower numbers give more accurate averages but are harder to calculate)
     monitor_num = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: secondary only, etc.
-    scan_method = scan_methods['ignore-black']
+    scan_method = scan_methods['default']
     colorScan_Hz = 60
 
     # get lifx interface and lights

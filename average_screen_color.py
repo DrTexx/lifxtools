@@ -25,6 +25,7 @@ fade_mode = fade_modes['game'] # default:'desktop'
 monitor_color_temp = monitor_color_temps['default']
 max_brightness = 100 # default:100
 monitor_num = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: secondary only, etc.
+colorScan_Hz = 60
 
 # functions
 def normal_scan(_img,_totpixels):
@@ -122,7 +123,7 @@ scan_methods = {'default': normal_scan, 'game-FPS': FPS_scan}
 scan_method = scan_methods['game-FPS']
 
 @d_benchmark
-def main_loop(sample_x,sample_y,totpixels,_lights,_monitor_color_temp):
+def scan_set_loop(sample_x,sample_y,totpixels,_lights,_monitor_color_temp):
 
     # get colour averages
     r, g, b = scan_screen(sample_x,sample_y,totpixels)
@@ -146,8 +147,8 @@ def main():
     sample_y = int(1080/30)
     totpixels = sample_x * sample_y
     while True:
-        main_loop(sample_x,sample_y,totpixels,lights,monitor_color_temp)
-        sleep(1/60) # TODO: this shouldn't be static, make it a preference
+        scan_set_loop(sample_x,sample_y,totpixels,lights,monitor_color_temp)
+        sleep(1/colorScan_Hz) # TODO: this shouldn't be static, make it a preference
 
 if __name__ == '__main__':
 

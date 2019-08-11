@@ -11,7 +11,7 @@ change all lifx globes to the on-screen color average of a monitor/s of your cho
 
 from lifxtools import return_interface, get_lights, list_lights, blink_light, managedLight, d_benchmark, create_managed_lights, rgbk2hsvk
 from mss import mss
-from PIL import Image
+from PIL import Image, ImageFilter
 from time import sleep
 
 # static options
@@ -43,6 +43,46 @@ def scan_img_average_color(_img):
     b = total_blue / totpixels
 
     # print("({:.1f},{:.1f},{:.1f})".format(r, g, b))
+
+    return((r, g, b))
+
+def scan_img_average_color_ignore_black(_img):
+    '''returns the color average for the entire screen'''
+
+    total_red = total_green = total_blue = total_ignored = 0
+
+    y_length = _img.size[1]
+    x_length = _img.size[0]
+    totpixels = y_length * x_length
+
+    for y in range(0, y_length):
+
+        for x in range(0, x_length):
+
+            pixel = _img.getpixel((x,y))
+
+            pixel_r, pixel_g, pixel_b = pixel
+
+            if (pixel_r < 12.75 and pixel_g < 12.75 and pixel_b < 12.75): # if there is less than 5% of r, g and b
+                total_ignored += 1
+            else:
+                total_red += pixel_r
+                total_green += pixel_g
+                total_blue += pixel_b
+
+    divider = totpixels - total_ignored
+
+    if (divider == 0):
+        r = 5
+        g = 5
+        b = 5
+    else:
+        r = total_red / (totpixels - total_ignored)
+        g = total_green / (totpixels - total_ignored)
+        b = total_blue / (totpixels - total_ignored)
+
+    print("({:.1f},{:.1f},{:.1f})".format(r, g, b))
+    print("ignored {} pixels ({:.2f}%)".format(total_ignored,total_ignored/totpixels*100))
 
     return((r, g, b))
 
@@ -119,7 +159,11 @@ def scan_img(_img,_scan_method):
     return((r, g, b))
 
 # static options requiring functions
-scan_methods = {'default': scan_img_average_color, 'game-FPS': FPS_scan}
+scan_methods = {
+    'default': scan_img_average_color,
+    'ignore-black': scan_img_average_color_ignore_black,
+    'game-FPS': FPS_scan
+}
 
 @d_benchmark
 def scan_set_loop(_scan_method,_sample_size,_lights,_monitor_num,_factor,_fade_mode,_monitor_color_temp,_max_brightness):
@@ -132,6 +176,9 @@ def scan_set_loop(_scan_method,_sample_size,_lights,_monitor_num,_factor,_fade_m
 
     # shrink resized image to sampling size
     img_shrunk = resize_img_to_size(img_resized,_sample_size)
+
+    # blur tiny image
+    # img_blurred = img_shrunk.filter(ImageFilter.BoxBlur(1))
 
     # get colour averages
     r, g, b = _scan_method(img_shrunk)
@@ -157,8 +204,9 @@ def main():
     max_brightness = 100 # default:100
     monitor_w = 1920
     monitor_h = 1080
+    monitor_sample_scale = 30 # default: 30 (lower numbers give more accurate averages but are harder to calculate)
     monitor_num = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: secondary only, etc.
-    scan_method = scan_methods['game-FPS']
+    scan_method = scan_methods['ignore-black']
     colorScan_Hz = 60
 
     # get lifx interface and lights
@@ -168,8 +216,7 @@ def main():
     managedLights = create_managed_lights(lights)
 
     # the block of data to analyze. PIL resizing to 1x1 seems to do strange things; a bigger box works better (and still plenty fast)
-    mon_sample_scale = 15 # default: 30
-    sample_size = (int(monitor_w/mon_sample_scale), int(monitor_h/mon_sample_scale))
+    sample_size = (int(monitor_w/monitor_sample_scale), int(monitor_h/monitor_sample_scale))
 
     try:
 

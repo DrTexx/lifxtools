@@ -87,18 +87,23 @@ def return_screengrab(_monitor_num):
         return(_img)
 
 def return_new_dimensions(_img,factor):
+
     og_width, og_height = _img.size
     width = int(og_width * factor)
     height = int(og_height * factor)
     return((width,height))
 
-def scan_screen(_scan_method,sample_x,sample_y,totpixels,_img,_factor):
+def resize_img_by_factor(_img,_factor):
 
-    resized_img = _img.resize(return_new_dimensions(_img,_factor), Image.NEAREST)
+    return(_img.resize(return_new_dimensions(_img,_factor), Image.NEAREST)) # shrink the image
 
-    shrunk_img = resized_img.resize((sample_x, sample_y)) # Shrink the image to a more manageable size with PIL (just a few ms on the average machine)
+def resize_img_to_size(_img,_sample_size):
 
-    r, g, b = _scan_method(shrunk_img,totpixels) # get the averages of each color in the image
+    return(_img.resize(_sample_size)) # Shrink the image to a more manageable size with PIL (just a few ms on the average machine)
+
+def get_img_rgb(_img,_scan_method,totpixels):
+
+    r, g, b = _scan_method(_img,totpixels) # get the averages of each color in the image
 
     print("({:.1f},{:.1f},{:.1f})".format(r, g, b))
 
@@ -108,10 +113,19 @@ def scan_screen(_scan_method,sample_x,sample_y,totpixels,_img,_factor):
 scan_methods = {'default': normal_scan, 'game-FPS': FPS_scan}
 
 @d_benchmark
-def scan_set_loop(_scan_method,sample_x,sample_y,totpixels,_lights,_monitor_num,_factor,_fade_mode,_monitor_color_temp,_max_brightness):
+def scan_set_loop(_scan_method,sample_size,totpixels,_lights,_monitor_num,_factor,_fade_mode,_monitor_color_temp,_max_brightness):
+
+    # get a screengrab of the selected monitor/s
+    img = return_screengrab(_monitor_num)
+
+    # resize screengrab to a more manageable size
+    img_resized = resize_img_by_factor(img,_factor)
+
+    # shrink resized image to sampling size
+    img_shrunk = resize_img_to_size(img_resized,sample_size)
 
     # get colour averages
-    r, g, b = scan_screen(_scan_method,sample_x,sample_y,totpixels,_monitor_num,_factor)
+    r, g, b = get_img_rgb(img_shrunk,_scan_method,totpixels)
 
     # convert rgb values to hsvk
     h, s, v, k = rgbk2hsvk (r, g, b, _monitor_color_temp)
@@ -145,6 +159,7 @@ def main():
     # the block of data to analyze. PIL resizing to 1x1 seems to do strange things; a bigger box works better (and still plenty fast)
     sample_x = int(1920/30)
     sample_y = int(1080/30)
+    sample_size = (sample_x, sample_y)
     totpixels = sample_x * sample_y
 
     try:
@@ -153,8 +168,12 @@ def main():
             ml.light.set_power(True)
             # blink_light(ml.light)
         while True:
-            img = return_screengrab(monitor_num)
-            scan_set_loop(scan_method,sample_x,sample_y,totpixels,lights,img,factor,fade_mode,monitor_color_temp,max_brightness)
+            # get a screengrab
+            # scan average RGB values
+            # convert RGB averages to HSVK
+            # apply user modifiers
+            # set light to new colour
+            scan_set_loop(scan_method,sample_size,totpixels,lights,monitor_num,factor,fade_mode,monitor_color_temp,max_brightness)
             sleep(1/colorScan_Hz) # TODO: this shouldn't be static, make it a preference
     finally:
         sleep(0.3)

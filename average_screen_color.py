@@ -19,6 +19,7 @@ fade_modes = {'game': 0, 'smooth': 5, 'movie': 150, 'desktop': 300, 'slow': 1000
 monitor_color_temps = {'default': 6500, 'nightLight': 4000} # always match monitor colour tempreture to this setting (in kelvin)
 
 # preferences
+num_lights = 3 # None: slower, automatic detection of all network lights, [integer]: specify number of lights, quicker discovery
 factor = 1 # 1: good PC performance, 0.75: average PC performance (may cause colour artifacting)
 fade_mode = fade_modes['game'] # default:'desktop'
 monitor_color_temp = monitor_color_temps['default']
@@ -141,13 +142,14 @@ def main():
     while True:
         main_loop(sample_x,sample_y,totpixels)
 
-# get lifx interface and lights
-lifx = return_interface(None)
-lights = get_lights(lifx)
-list_lights(lights)
-managedLights = create_managed_lights(lights)
-
 if __name__ == '__main__':
+
+    # get lifx interface and lights
+    lifx = return_interface(num_lights)
+    lights = get_lights(lifx)
+    list_lights(lights)
+    managedLights = create_managed_lights(lights)
+
     try:
         for ml in managedLights:
             ml.ssave()

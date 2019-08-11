@@ -18,15 +18,6 @@ from time import sleep
 fade_modes = {'game': 0, 'smooth': 5, 'movie': 150, 'desktop': 300, 'slow': 1000, 'super-slow': 2000, 'ultra-slow': 5000}
 monitor_color_temps = {'default': 6500, 'nightLight': 4000} # always match monitor colour tempreture to this setting (in kelvin)
 
-# preferences
-num_lights = 3 # None: slower, automatic detection of all network lights, [integer]: specify number of lights, quicker discovery
-factor = 1 # 1: good PC performance, 0.75: average PC performance (may cause colour artifacting)
-fade_mode = fade_modes['game'] # default:'desktop'
-monitor_color_temp = monitor_color_temps['default']
-max_brightness = 100 # default:100
-monitor_num = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: secondary only, etc.
-colorScan_Hz = 60
-
 # functions
 def normal_scan(_img,_totpixels):
     '''returns the color average for the entire screen'''
@@ -88,12 +79,6 @@ def FPS_scan(_img,_totpixels,start_perc=0.25,end_perc=0.75):
 
     # raise NotImplementedError()
 
-def get_color_averages(img,totpixels):
-    '''get averages of colors in image'''
-    red, green, blue = scan_method(img,totpixels)
-
-    return((red, green, blue))
-
 def return_screengrab(_monitor_num):
     with mss() as sct:
         monitors = sct.monitors[_monitor_num] # get monitor object
@@ -107,50 +92,49 @@ def return_new_dimensions(_img,factor):
     height = int(og_height * factor)
     return((width,height))
 
-def scan_screen(sample_x,sample_y,totpixels):
-    img = return_screengrab(monitor_num)
-    resized_img = img.resize(return_new_dimensions(img,factor), Image.NEAREST)
-    shrunk_img = resized_img.resize((sample_x, sample_y)) # Shrink the image to a more manageable size with PIL (just a few ms on the average machine)
-    average_red, average_green, average_blue = get_color_averages(shrunk_img,totpixels) # get the averages of each color in the image
-    print("({:.1f},{:.1f},{:.1f})".format(average_red, average_green, average_blue))
+def scan_screen(_scan_method,sample_x,sample_y,totpixels,_img,_factor):
 
-    return((average_red, average_green, average_blue))
+    resized_img = _img.resize(return_new_dimensions(_img,_factor), Image.NEAREST)
+
+    shrunk_img = resized_img.resize((sample_x, sample_y)) # Shrink the image to a more manageable size with PIL (just a few ms on the average machine)
+
+    r, g, b = _scan_method(shrunk_img,totpixels) # get the averages of each color in the image
+
+    print("({:.1f},{:.1f},{:.1f})".format(r, g, b))
+
+    return((r, g, b))
 
 # static options requiring functions
 scan_methods = {'default': normal_scan, 'game-FPS': FPS_scan}
 
-# preferences requiring functions
-scan_method = scan_methods['game-FPS']
-
 @d_benchmark
-def scan_set_loop(sample_x,sample_y,totpixels,_lights,_monitor_color_temp):
+def scan_set_loop(_scan_method,sample_x,sample_y,totpixels,_lights,_monitor_num,_factor,_fade_mode,_monitor_color_temp,_max_brightness):
 
     # get colour averages
-    r, g, b = scan_screen(sample_x,sample_y,totpixels)
+    r, g, b = scan_screen(_scan_method,sample_x,sample_y,totpixels,_monitor_num,_factor)
 
     # convert rgb values to hsvk
     h, s, v, k = rgbk2hsvk (r, g, b, _monitor_color_temp)
 
     # adjust the colours to user preferences
-    color = (h, s, v*(max_brightness/100), k)
+    color = (h, s, v*(_max_brightness/100), k)
 
     # set each light to the colour just generated
     for light in _lights:
-        light.set_color(color,fade_mode,rapid=True)
+        light.set_color(color,_fade_mode,rapid=True)
 
 def main():
     '''main function for scanning screen colors and applying color average to lifx lights'''
-    # the block of data to analyze.
-    # PIL resizing to 1x1 seems to do strange things; a bigger box works better
-    # and still plenty fast...
-    sample_x = int(1920/30)
-    sample_y = int(1080/30)
-    totpixels = sample_x * sample_y
-    while True:
-        scan_set_loop(sample_x,sample_y,totpixels,lights,monitor_color_temp)
-        sleep(1/colorScan_Hz) # TODO: this shouldn't be static, make it a preference
 
-if __name__ == '__main__':
+    # preferences
+    num_lights = 3 # None: slower, automatic detection of all network lights, [integer]: specify number of lights, quicker discovery
+    factor = 1 # 1: good PC performance, 0.75: average PC performance (may cause colour artifacting)
+    fade_mode = fade_modes['game'] # default:'desktop'
+    monitor_color_temp = monitor_color_temps['default']
+    max_brightness = 100 # default:100
+    monitor_num = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: secondary only, etc.
+    scan_method = scan_methods['game-FPS']
+    colorScan_Hz = 60
 
     # get lifx interface and lights
     lifx = return_interface(num_lights)
@@ -158,14 +142,25 @@ if __name__ == '__main__':
     list_lights(lights)
     managedLights = create_managed_lights(lights)
 
+    # the block of data to analyze. PIL resizing to 1x1 seems to do strange things; a bigger box works better (and still plenty fast)
+    sample_x = int(1920/30)
+    sample_y = int(1080/30)
+    totpixels = sample_x * sample_y
+
     try:
         for ml in managedLights:
             ml.ssave()
             ml.light.set_power(True)
             # blink_light(ml.light)
-        main()
+        while True:
+            img = return_screengrab(monitor_num)
+            scan_set_loop(scan_method,sample_x,sample_y,totpixels,lights,img,factor,fade_mode,monitor_color_temp,max_brightness)
+            sleep(1/colorScan_Hz) # TODO: this shouldn't be static, make it a preference
     finally:
         sleep(0.3)
         for ml in managedLights:
             # blink_light(ml.light)
             ml.sload()
+
+if __name__ == '__main__':
+    main()

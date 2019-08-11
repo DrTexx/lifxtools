@@ -122,14 +122,20 @@ scan_methods = {'default': normal_scan, 'game-FPS': FPS_scan}
 scan_method = scan_methods['game-FPS']
 
 @d_benchmark
-def main_loop(sample_x,sample_y,totpixels):
-    average_red, average_green, average_blue = scan_screen(sample_x,sample_y,totpixels)
-    h, s, v, k = rgbk2hsvk (average_red, average_green, average_blue, monitor_color_temp)
-    color = (h, s, v*(max_brightness/100), k)
-    for light in lights:
-        light.set_color(color,fade_mode,rapid=True)
+def main_loop(sample_x,sample_y,totpixels,_lights,_monitor_color_temp):
 
-    sleep(1/60)
+    # get colour averages
+    r, g, b = scan_screen(sample_x,sample_y,totpixels)
+
+    # convert rgb values to hsvk
+    h, s, v, k = rgbk2hsvk (r, g, b, _monitor_color_temp)
+
+    # adjust the colours to user preferences
+    color = (h, s, v*(max_brightness/100), k)
+
+    # set each light to the colour just generated
+    for light in _lights:
+        light.set_color(color,fade_mode,rapid=True)
 
 def main():
     '''main function for scanning screen colors and applying color average to lifx lights'''
@@ -140,7 +146,8 @@ def main():
     sample_y = int(1080/30)
     totpixels = sample_x * sample_y
     while True:
-        main_loop(sample_x,sample_y,totpixels)
+        main_loop(sample_x,sample_y,totpixels,lights,monitor_color_temp)
+        sleep(1/60) # TODO: this shouldn't be static, make it a preference
 
 if __name__ == '__main__':
 

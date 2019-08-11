@@ -9,7 +9,7 @@ change all lifx globes to the on-screen color average of a monitor/s of your cho
 # programs such as Flux or other 'Night Light' alternatives may impact colours.
 # I can confirm this is the case for Night Light in the Gnome flavour of Debian 10 Buster.
 
-from lifxtools import return_interface, get_lights, list_lights, blink_light, managedLight, d_benchmark, create_managed_lights
+from lifxtools import return_interface, get_lights, list_lights, blink_light, managedLight, d_benchmark, create_managed_lights, rgbk2hsvk
 from mss import mss
 from PIL import Image
 from time import sleep
@@ -27,14 +27,6 @@ max_brightness = 100 # default:100
 monitor_num = 1 # 0:all-monitors combined (+black?), 1:primary only, 2: secondary only, etc.
 
 # functions
-def rgb2hsv(r, g, b):
-    ''' helper for colors conversion/scaling '''
-    h, s, v = rgb_to_hsv(r / 255.0, g / 255.0, b / 255.0)
-    h = h * 0xffff
-    s = s * 0xffff
-    v = v * 0xffff
-    return(h, s, v)
-
 def normal_scan(_img,_totpixels):
     '''returns the color average for the entire screen'''
     total_red = total_green = total_blue = 0

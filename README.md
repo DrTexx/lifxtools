@@ -36,3 +36,6 @@ With the addition of benchmarking capabilities available to the user, this will 
 
 ### Don't send packets if colour is identical to last sent colour
 This has the intention of saving network bandwidth (and potenially a small amount of processing time)
+
+### Add firewall issue detection
+Add tests for if a firewall is in place and whether it may cause issues for the scripts, if it's detected that it will, return a verbose error to the user to help them rectify the issue.

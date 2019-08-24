@@ -40,13 +40,13 @@ try:
 
         volume_norm = np.linalg.norm(data)*10
         normLR = clamp((volume_norm / maxValue) / 100, 0, 1)
-        print(normLR)
+        # print(normLR)
 
         bars = 100
-        lrString = "#"*int(normLR*bars)+"-"*int(bars-normLR*bars)
-        hueString = "#"*int(i*bars)+"-"*int(bars-i*bars)
+        lrString = "■"*int(normLR*bars)+"□"*int(bars-normLR*bars)
+        hueString = "■"*int(i*bars)+"□"*int(bars-i*bars)
         print("normLR=[{}]".format(lrString))
-        print("hue=[{}]".format(hueString))
+        print("---hue=[{}]".format(hueString))
 
         h = 65535*i
         s = 65535*normLR

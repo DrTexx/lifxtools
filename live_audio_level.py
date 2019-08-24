@@ -10,7 +10,7 @@ import math
 clamp = lambda value, minv, maxv: max(min(value, maxv), minv)
 
 # settings
-fade = 0 # in milliseconds
+fade = 5 # in milliseconds
 
 lifx = lifxtools.return_interface(None)
 lights = lifx.get_lights()
@@ -26,6 +26,7 @@ try:
     stream=p.open(format=pyaudio.paInt16,channels=2,rate=44100,
                   input=True, frames_per_buffer=1024)
 
+    i = 0
     while True:
         data = np.frombuffer(stream.read(1024),dtype=np.int16)
         print(data)
@@ -41,8 +42,24 @@ try:
         normLR = clamp((volume_norm / maxValue) / 100, 0, 1)
         print(normLR)
 
+        bars = 100
+        lrString = "#"*int(normLR*bars)+"-"*int(bars-normLR*bars)
+        hueString = "#"*int(i*bars)+"-"*int(bars-i*bars)
+        print("normLR=[{}]".format(lrString))
+        print("hue=[{}]".format(hueString))
+
+        h = 65535*i
+        s = 65535*normLR
+        v = 65535/2
+        k = 6500
+
         for light in lights:
-            light.set_color((65535*normLR, 65535*0.5, (65535*normLR)/2, 6500),fade,rapid=True)
+            light.set_color((h, s, v, k),fade,rapid=True)
+
+        if (i < 1):
+            i += 0.01
+        else:
+            i = 0
 
         # print("L:%00.02f R:%00.02f"%(peakL*100, peakR*100))
 finally:

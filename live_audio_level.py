@@ -13,6 +13,13 @@
 # if you're a spotify user, enable normalization and set your volume level to 'Loud'
 # this let's you get the most out of your volume and better maintains audio quality.
 
+# songs for testing:
+# Flux Pavilion feat. Steve Aoki - Steve French [looks alright, but beats aren't very solitary]
+# Gold Top - Uh Oh (Stand Tall Fists Up Remix) [looks amazing, however the bass is SO INTENSE that multiplier needs to be reduced]
+# Yeah Yeah Yeahs - Heads Will Roll (A-Trak Version) (JVH-C Remix) [totally awesome]
+# TOP $HELF - Run That $hit [god-tier bass-wobbles and juicy hits]
+# Jack U_ x Ekali x Gravez - Mind (Karol Tip Edit) [insane unique bass that demands attention, inspires me to work on bass isolation so I can replicate the frequency of subs in light saturation]
+
 import pyaudio
 import numpy as np
 import lifxtools

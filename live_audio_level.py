@@ -91,10 +91,17 @@ try:
         print("normLR=[{}] ({})".format(lrString + Style.RESET_ALL,int(normLR*100)))
         # print("---hue=[{}] ({})".format(hueString,hue))
 
+        # flash mode! (loud means bright!)
         h = 65535*hue
         s = 65535*(1-normLR) # inverse saturation - higher levels = lower saturation
         v = 65535*normLR # regular brightness
         k = 6500
+
+        # blackout mode! (bass seems to feel more natural)
+        # h = 65535*hue
+        # s = 65535*normLR # regular saturation - higher levels = higher saturation
+        # v = 65535*(1-normLR) # inverse brightness - higher levels = lower brightness
+        # k = 6500
 
         for light in lights:
             light.set_color((h, s, v, k),fade,rapid=True)

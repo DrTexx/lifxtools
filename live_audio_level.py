@@ -92,8 +92,8 @@ try:
         # print("---hue=[{}] ({})".format(hueString,hue))
 
         h = 65535*hue
-        s = 65535*normLR
-        v = 65535
+        s = 65535*(1-normLR) # inverse saturation - higher levels = lower saturation
+        v = 65535*normLR # regular brightness
         k = 6500
 
         for light in lights:

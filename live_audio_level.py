@@ -26,6 +26,7 @@ from hsv2ansi import hsv2ansi
 
 # settings
 fade = 5 # in milliseconds
+slow_hue = True
 vol_multiplier = 8 # 6 - Loud HQ music, 8 - Normal HQ Music or Spotify normalized to 'loud' enviroment, 10 - spotify normalize to 'normal'
 
 # thanks to the commenter "Dima Tisnek" for this elegant solution to clamping:
@@ -91,7 +92,12 @@ try:
             light.set_color((h, s, v, k),fade,rapid=True)
 
         if (hue < 1):
-            hue += 0.001
+            if (slow_hue == True):
+                hue += 0.001
+            elif (slow_hue == False):
+                hue += 0.01
+            else:
+                raise TypeError("slow_hue must be a bool!")
         else:
             hue = 0
 

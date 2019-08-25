@@ -35,7 +35,7 @@ from hsv2ansi import hsv2ansi
 # settings
 fade = 5 # in milliseconds
 slow_hue = True
-vol_multiplier = 8 # 6 - Loud HQ music, 8 - Normal HQ Music or Spotify normalized to 'loud' enviroment, 10 - spotify normalize to 'normal'
+vol_multiplier = 6 # 6 - Loud HQ music, 8 - Normal HQ Music or Spotify normalized to 'loud' enviroment, 10 - spotify normalize to 'normal'
 
 # thanks to the commenter "Dima Tisnek" for this elegant solution to clamping:
 # https://stackoverflow.com/q/4092528
@@ -77,7 +77,10 @@ try:
 
         bars_active = int(normLR*bar_total)
 
-        active_style = hsv2ansi(hue,0,0)
+        volume_cycle_impact = 1 # number is the amount of time to skip into the future when the volume is loud
+        hue_y = abs(math.sin(hue + hue*volume_cycle_impact*normLR))
+
+        active_style = hsv2ansi(hue_y,0,0)
 
         # Histogram mode
         active_blocks = active_style[0] + active_style[1] + bar_activated * bars_active
@@ -92,14 +95,14 @@ try:
         # print("---hue=[{}] ({})".format(hueString,hue))
 
         # flash mode! (loud means bright!)
-        h = 65535*hue
-        s = 65535*(1-normLR) # inverse saturation - higher levels = lower saturation
-        v = 65535*normLR # regular brightness
+        h = 65535*hue_y
+        s = 65535*math.cos(1-normLR) # inverse saturation - higher levels = lower saturation
+        v = 1 + ((65535-1)*normLR) # regular brightness
         k = 6500
 
         # blackout mode! (bass seems to feel more natural)
         # h = 65535*hue
-        # s = 65535*normLR # regular saturation - higher levels = higher saturation
+        # s = 65535*math.sin(normLR) # regular saturation - higher levels = higher saturation
         # v = 65535*(1-normLR) # inverse brightness - higher levels = lower brightness
         # k = 6500
 

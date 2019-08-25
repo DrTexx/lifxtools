@@ -19,6 +19,7 @@
 # Yeah Yeah Yeahs - Heads Will Roll (A-Trak Version) (JVH-C Remix) [totally awesome]
 # TOP $HELF - Run That $hit [god-tier bass-wobbles and juicy hits]
 # Jack U x Ekali x Gravez - Mind (Karol Tip Edit) [insane unique bass that demands attention, inspires me to work on bass isolation so I can replicate the frequency of subs in light saturation]
+# SAINT WKND x SAINT MOTEL - MY TYPE [good for testing future bass isolation]
 
 import pyaudio
 import numpy as np

@@ -9,6 +9,10 @@
 # it is recommended to max out the volume in applications such as spotify
 # and then adjust your actual desktop output level to a desirable volume
 
+# protip:
+# if you're a spotify user, enable normalization and set your volume level to 'Loud'
+# this let's you get the most out of your volume and better maintains audio quality.
+
 import pyaudio
 import numpy as np
 import lifxtools
@@ -22,6 +26,7 @@ from hsv2ansi import hsv2ansi
 
 # settings
 fade = 5 # in milliseconds
+vol_multiplier = 8 # 6 - Loud HQ music, 8 - Normal HQ Music or Spotify normalized to 'loud' enviroment, 10 - spotify normalize to 'normal'
 
 # thanks to the commenter "Dima Tisnek" for this elegant solution to clamping:
 # https://stackoverflow.com/q/4092528
@@ -53,7 +58,7 @@ try:
         # peakLR = (peakL + peakR) / 2
         # print(peakLR*100)
 
-        volume_norm = np.linalg.norm(data)*10
+        volume_norm = np.linalg.norm(data)*vol_multiplier
         normLR = clamp((volume_norm / maxValue) / 100, 0, 1)
         # print(normLR)
 

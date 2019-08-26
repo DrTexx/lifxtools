@@ -20,6 +20,7 @@
 # TOP $HELF - Run That $hit [god-tier bass-wobbles and juicy hits]
 # Jack U x Ekali x Gravez - Mind (Karol Tip Edit) [insane unique bass that demands attention, inspires me to work on bass isolation so I can replicate the frequency of subs in light saturation]
 # SAINT WKND x SAINT MOTEL - MY TYPE [good for testing future bass isolation]
+# Jake Hill - Snowflake [my good the audio is the bass in this song, no isolation needed, really clear graph]
 
 import pyaudio
 import numpy as np

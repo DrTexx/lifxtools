@@ -33,27 +33,34 @@ from colorama import Fore, Back, Style
 
 from hsv2ansi import hsv2ansi
 
-# settings
-fade = 5 # in milliseconds
+# ---- settings ----
+
+fade = 100 # in milliseconds
 slow_hue = True
 vol_multiplier = 6 # 6 - Loud HQ music, 8 - Normal HQ Music or Spotify normalized to 'loud' enviroment, 10 - spotify normalize to 'normal'
+
+# ---- functions ----
 
 # thanks to the commenter "Dima Tisnek" for this elegant solution to clamping:
 # https://stackoverflow.com/q/4092528
 clamp = lambda value, minv, maxv: max(min(value, maxv), minv)
 
+def set_lights(h,s,v,k,fade,rapid):
+    for light in lights:
+        light.set_color((h, s, v, k),fade,rapid=rapid)
+
+# ---- script ----
+
 lifx = lifxtools.return_interface(None)
 lights = lifx.get_lights()
 managedLights = lifxtools.create_managed_lights(lights)
 
-for ml in managedLights:
-    ml.ssave()
-    ml.light.set_power(True)
+lifxtools.prepare_managedLights(managedLights)
 
 try:
     maxValue = 2**16
-    p=pyaudio.PyAudio()
-    stream=p.open(format=pyaudio.paInt16,channels=2,rate=44100,
+    pa=pyaudio.PyAudio()
+    stream=pa.open(format=pyaudio.paInt16,channels=2,rate=44100,
                   input=True, frames_per_buffer=1024)
 
     hue = 0 # float: 0 .. 1
@@ -96,7 +103,7 @@ try:
         # print("---hue=[{}] ({})".format(hueString,hue))
 
         # flash mode! (loud means bright!)
-        h = 65535*hue_y
+        h = 65535*(1-hue_y)
         s = 65535*math.cos(1-normLR) # inverse saturation - higher levels = lower saturation
         v = 1 + ((65535-1)*normLR) # regular brightness
         k = 6500
@@ -107,21 +114,16 @@ try:
         # v = 65535*(1-normLR) # inverse brightness - higher levels = lower brightness
         # k = 6500
 
-        for light in lights:
-            light.set_color((h, s, v, k),fade,rapid=True)
+        set_lights(h,s,v,k,fade,True)
 
         if (hue < 1):
-            if (slow_hue == True):
-                hue += 0.001
-            elif (slow_hue == False):
-                hue += 0.01
-            else:
-                raise TypeError("slow_hue must be a bool!")
+            if (slow_hue == True): hue += 0.001
+            elif (slow_hue == False): hue += 0.01
+            else: raise TypeError("slow_hue must be a bool!")
         else:
             hue = 0
 
         # print("L:%00.02f R:%00.02f"%(peakL*100, peakR*100))
 finally:
-    for ml in managedLights:
-        ml.sload()
-        Style.RESET_ALL
+    lifxtools.restore_managedLights(managedLights)
+    Style.RESET_ALL

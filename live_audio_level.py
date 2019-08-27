@@ -22,7 +22,6 @@
 # SAINT WKND x SAINT MOTEL - MY TYPE [good for testing future bass isolation]
 # Jake Hill - Snowflake [my good the audio is the bass in this song, no isolation needed, really clear graph]
 
-import pyaudio
 import numpy as np
 import lifxtools
 import math
@@ -49,11 +48,11 @@ def set_lights(h,s,v,k,fade,rapid):
     for light in lights:
         light.set_color((h, s, v, k),fade,rapid=rapid)
 
-def print_bar(_seg_active,_seg_inactive,_val,_total_segments=100):
+def print_bar(_name,_val,_seg_active,_seg_inactive,_total_segments=100):
 
     # check inputed data
-    if not (type(_seg_active) == barSegment or type(_seg_inactive) == barSegment):
-        raise TypeError("active_segment and inactive_segment must be barSegment objects")
+    if not (type(_seg_active) == BarSegment or type(_seg_inactive) == BarSegment):
+        raise TypeError("active_segment and inactive_segment must be BarSegment objects")
     elif not (0 <= _val <= 1): # ensure _val is between 0 and 1
         raise ValueError("val must be between 0 and 1")
     else:
@@ -62,24 +61,28 @@ def print_bar(_seg_active,_seg_inactive,_val,_total_segments=100):
         active_string = _seg_active.gen_segments(segments_activated)
         inactive_string = _seg_inactive.gen_segments(_total_segments - segments_activated)
 
-        lrString = "normLR=[{}{}{}] ({})".format(active_string, inactive_string, Style.RESET_ALL, int(normLR*100))
+        lrString = "{}=[{}{}{}] ({})".format(_name,active_string, inactive_string, Style.RESET_ALL, int(_val*100))
 
         print(lrString)
 
 # ---- classes ----
 
-class barSegment:
+class BarSegment:
 
-    def __init__(self,symbol,styles=[],fore="",back=""):
+    def __init__(self,symbol,fore="",back=""):
         self.symbol = symbol
         self.fore = fore
         self.back = back
 
-    def gen_style_string(self):
-        return(self.fore + self.back)
-
     def gen_segments(self,amount):
-        return(self.gen_style_string() + self.symbol * amount + Style.RESET_ALL)
+        return(self.fore + self.back + self.symbol * amount + Style.RESET_ALL)
+
+class Audio:
+
+    def __init__(self):
+        import pyaudio
+        self.pa = pyaudio.PyAudio()
+        self.stream = self.pa.open(format=pyaudio.paInt16, channels=2, rate=44100, input=True, frames_per_buffer=1024)
 
 # ---- script ----
 
@@ -91,22 +94,22 @@ lifxtools.prepare_managedLights(managedLights)
 
 try:
     maxValue = 2**16
-    pa=pyaudio.PyAudio()
-    stream=pa.open(format=pyaudio.paInt16,channels=2,rate=44100,
-                  input=True, frames_per_buffer=1024)
 
-    active_segment = barSegment("■") # todo: this is a bit wasteful, revise this later
-    inactive_segment = barSegment("□")
+    active_segment = BarSegment("■") # todo: this is a bit wasteful, revise this later
+    inactive_segment = BarSegment("□")
+
+    audio = Audio()
 
     hue = 0 # float: 0 .. 1
+
     while True:
 
-        data = np.frombuffer(stream.read(1024),dtype=np.int16)
+        data = np.frombuffer(audio.stream.read(1024),dtype=np.int16)
 
-        # dataL = data[0::2]
-        # dataR = data[1::2]
-        # peakL = np.abs(np.max(dataL)-np.min(dataL))/maxValue
-        # peakR = np.abs(np.max(dataR)-np.min(dataR))/maxValue
+        dataL = data[0::2]
+        dataR = data[1::2]
+        peakL = np.abs(np.max(dataL)-np.min(dataL))/maxValue
+        peakR = np.abs(np.max(dataR)-np.min(dataR))/maxValue
 
         volume_norm = np.linalg.norm(data)*vol_multiplier # normalize audio level
         normLR = clamp((volume_norm / maxValue) / 100, 0, 1) # clamp audio level
@@ -124,7 +127,9 @@ try:
 
         active_segment.fore, active_segment.back = (hue_y_ansi)
         inactive_segment.fore, inactive_segment.back = (hue_y_ansi[0], Back.BLACK)
-        print_bar(active_segment,inactive_segment,normLR)
+        print_bar("normLR",normLR,active_segment,inactive_segment)
+        # print_bar("peakL",peakL,active_segment,inactive_segment)
+        # print_bar("peakR",peakR,active_segment,inactive_segment)
 
         # flash mode! (loud means bright!)
         h = 65535*hue_y

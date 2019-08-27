@@ -156,3 +156,12 @@ def rgbk2hsvk(r, g, b, k):
     v = v * 0xffff
     k = k
     return(h, s, v, k)
+
+def prepare_managedLights(_managedLights):
+    for ml in _managedLights:
+        ml.ssave()
+        ml.light.set_power(True)
+
+def restore_managedLights(_managedLights):
+    for ml in _managedLights:
+        ml.sload()

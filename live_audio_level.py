@@ -35,7 +35,7 @@ from hsv2ansi import hsv2ansi
 
 # ---- settings ----
 
-fade = 100 # in milliseconds
+fade = 5 # in milliseconds
 slow_hue = True
 vol_multiplier = 6 # 6 - Loud HQ music, 8 - Normal HQ Music or Spotify normalized to 'loud' enviroment, 10 - spotify normalize to 'normal'
 
@@ -70,13 +70,16 @@ def print_bar(_seg_active,_seg_inactive,_val,_total_segments=100):
 
 class barSegment:
 
-    def __init__(self,symbol,styles=[]):
+    def __init__(self,symbol,styles=[],fore="",back=""):
         self.symbol = symbol
-        self.styles = styles
-        self.style_string = "".join(styles)
+        self.fore = fore
+        self.back = back
+
+    def gen_style_string(self):
+        return(self.fore + self.back)
 
     def gen_segments(self,amount):
-        return(self.style_string + self.symbol * amount + Style.RESET_ALL)
+        return(self.gen_style_string() + self.symbol * amount + Style.RESET_ALL)
 
 # ---- script ----
 
@@ -92,7 +95,6 @@ try:
     stream=pa.open(format=pyaudio.paInt16,channels=2,rate=44100,
                   input=True, frames_per_buffer=1024)
 
-    initial_ansi = hsv2ansi(0,0,0)
     active_segment = barSegment("■") # todo: this is a bit wasteful, revise this later
     inactive_segment = barSegment("□")
 
@@ -112,18 +114,20 @@ try:
         volume_cycle_impact = 1 # number is the amount of time to skip into the future of the hue cycle when the volume is loud
 
         hue_y = abs(math.sin(hue + hue*volume_cycle_impact*normLR))
+
         hue_y_ansi = hsv2ansi(hue_y,0,0)
 
-        print(hue_y)
-        print(hue_y_ansi)
+        # active_segment.styles[0] = hue_y_ansi[0] # restyle segment to new hue
+        # active_segment.styles[1] = hue_y_ansi[1] # restyle segment to new hue
+        # inactive_segment.styles[0] = hue_y_ansi[0] # restyle segment to new hue
+        # inactive_segment.styles[1] = Back.BLACK
 
-        active_segment.style = [hue_y_ansi[0], hue_y_ansi[1]] # restyle segment to new hue
-        inactive_segment.style = [hue_y_ansi[0], Back.BLACK] # restyle segment to new hue
-
+        active_segment.fore, active_segment.back = (hue_y_ansi)
+        inactive_segment.fore, inactive_segment.back = (hue_y_ansi[0], Back.BLACK)
         print_bar(active_segment,inactive_segment,normLR)
 
         # flash mode! (loud means bright!)
-        h = 65535*(1-hue_y)
+        h = 65535*hue_y
         s = 65535*math.cos(1-normLR) # inverse saturation - higher levels = lower saturation
         v = 1 + ((65535-1)*normLR) # regular brightness
         k = 6500

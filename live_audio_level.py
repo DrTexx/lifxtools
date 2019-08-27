@@ -49,6 +49,35 @@ def set_lights(h,s,v,k,fade,rapid):
     for light in lights:
         light.set_color((h, s, v, k),fade,rapid=rapid)
 
+def print_bar(_seg_active,_seg_inactive,_val,_total_segments=100):
+
+    # check inputed data
+    if not (type(_seg_active) == barSegment or type(_seg_inactive) == barSegment):
+        raise TypeError("active_segment and inactive_segment must be barSegment objects")
+    elif not (0 <= _val <= 1): # ensure _val is between 0 and 1
+        raise ValueError("val must be between 0 and 1")
+    else:
+        segments_activated = int(_val*_total_segments)
+
+        active_string = _seg_active.gen_segments(segments_activated)
+        inactive_string = _seg_inactive.gen_segments(_total_segments - segments_activated)
+
+        lrString = "normLR=[{}{}{}] ({})".format(active_string, inactive_string, Style.RESET_ALL, int(normLR*100))
+
+        print(lrString)
+
+# ---- classes ----
+
+class barSegment:
+
+    def __init__(self,symbol,styles=[]):
+        self.symbol = symbol
+        self.styles = styles
+        self.style_string = "".join(styles)
+
+    def gen_segments(self,amount):
+        return(self.style_string + self.symbol * amount + Style.RESET_ALL)
+
 # ---- script ----
 
 lifx = lifxtools.return_interface(None)
@@ -63,44 +92,35 @@ try:
     stream=pa.open(format=pyaudio.paInt16,channels=2,rate=44100,
                   input=True, frames_per_buffer=1024)
 
+    initial_ansi = hsv2ansi(0,0,0)
+    active_segment = barSegment("■") # todo: this is a bit wasteful, revise this later
+    inactive_segment = barSegment("□")
+
     hue = 0 # float: 0 .. 1
     while True:
+
         data = np.frombuffer(stream.read(1024),dtype=np.int16)
-        # print(data)
 
         # dataL = data[0::2]
         # dataR = data[1::2]
         # peakL = np.abs(np.max(dataL)-np.min(dataL))/maxValue
         # peakR = np.abs(np.max(dataR)-np.min(dataR))/maxValue
-        # peakLR = (peakL + peakR) / 2
-        # print(peakLR*100)
 
-        volume_norm = np.linalg.norm(data)*vol_multiplier
-        normLR = clamp((volume_norm / maxValue) / 100, 0, 1)
-        # print(normLR)
+        volume_norm = np.linalg.norm(data)*vol_multiplier # normalize audio level
+        normLR = clamp((volume_norm / maxValue) / 100, 0, 1) # clamp audio level
 
-        bar_total = 100
-        bar_activated = "■"
-        bar_inactived = "□"
+        volume_cycle_impact = 1 # number is the amount of time to skip into the future of the hue cycle when the volume is loud
 
-        bars_active = int(normLR*bar_total)
-
-        volume_cycle_impact = 1 # number is the amount of time to skip into the future when the volume is loud
         hue_y = abs(math.sin(hue + hue*volume_cycle_impact*normLR))
+        hue_y_ansi = hsv2ansi(hue_y,0,0)
 
-        active_style = hsv2ansi(hue_y,0,0)
+        print(hue_y)
+        print(hue_y_ansi)
 
-        # Histogram mode
-        active_blocks = active_style[0] + active_style[1] + bar_activated * bars_active
-        # Bar Mode
-        # active_blocks = active_style[0] + Back.BLACK + bar_activated * bars_active
+        active_segment.style = [hue_y_ansi[0], hue_y_ansi[1]] # restyle segment to new hue
+        inactive_segment.style = [hue_y_ansi[0], Back.BLACK] # restyle segment to new hue
 
-        inactive_blocks = Back.BLACK + bar_inactived * (bar_total - bars_active)
-
-        lrString = '{}{}'.format(active_blocks,inactive_blocks)
-
-        print("normLR=[{}] ({})".format(lrString + Style.RESET_ALL,int(normLR*100)))
-        # print("---hue=[{}] ({})".format(hueString,hue))
+        print_bar(active_segment,inactive_segment,normLR)
 
         # flash mode! (loud means bright!)
         h = 65535*(1-hue_y)

@@ -31,28 +31,29 @@ try:
 
         tap_was_detected, amplitude = tt.listen()
 
+    #     if (tap_was_detected == True):
+    #         pass
+    #         # plt.scatter(i,amplitude)
+    #         # plt.pause(0.05)
+    # plt.show()
+
+
+
         if (tap_was_detected == True):
-            plt.scatter(i,amplitude)
-            plt.pause(0.05)
-    plt.show()
-
-
-
-        # if (tap_was_detected == True):
-        #     print("tap!")
-        #     # for light in lights:
-        #     #     lifxtools.toggle_light(light)
-        #     print(hue)
-        #     for light in lights:
-        #         light.set_color((hue, 65535/4, 65535/2, 5500),100,rapid=True)
-        #     sleep(100/1000)
-        #     for light in lights:
-        #         light.set_color((hue, 65535/4, 65535, 5500),100,rapid=True)
-        #
-        #     if (hue < (65535*0.9)):
-        #         hue += 65535*0.1
-        #     else:
-        #         hue = 0
+            print("tap!")
+            # for light in lights:
+            #     lifxtools.toggle_light(light)
+            print(hue)
+            for light in lights:
+                light.set_color((hue, 65535/4, 65535/2, 5500),100,rapid=True)
+            sleep(100/1000)
+            for light in lights:
+                light.set_color((hue, 65535/4, 65535, 5500),100,rapid=True)
+        
+            if (hue < (65535*0.9)):
+                hue += 65535*0.1
+            else:
+                hue = 0
 
 except Exception as err:
     print("ERROR!")

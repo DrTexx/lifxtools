@@ -137,6 +137,12 @@ try:
         v = 1 + ((65535-1)*normLR) # regular brightness
         k = 6500
 
+        # whiteout mode!
+        # h = 65535*(1-hue_y)
+        # s = 65535*math.cos(1-normLR) # inverse saturation - higher levels = lower saturation
+        # v = 1 + ((65535-1)*normLR) # regular brightness
+        # k = 6500
+
         # blackout mode! (bass seems to feel more natural)
         # h = 65535*hue
         # s = 65535*math.sin(normLR) # regular saturation - higher levels = higher saturation

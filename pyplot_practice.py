@@ -12,10 +12,13 @@ freq = 20 # the frequency of the signal we're producing
 time_between_samples = seconds / samplerate
 total_samples = seconds * samplerate
 
+time = []
 data = []
 
 for n in range(total_samples):
-    data.append(math.cos(n))
+    seconds = n/samplerate
+    time.append(seconds)
+    data.append(math.cos(seconds))
 
 # y1 = []
 # y2 = []
@@ -33,7 +36,7 @@ for n in range(total_samples):
 
 plt.figure()
 # plt.plot(x,x)
-plt.plot(data)
+plt.plot(time,data)
 # plt.plot(x,y2)
 # plt.plot(x,y3)
 plt.ylabel('more numbers')

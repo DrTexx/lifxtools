@@ -34,11 +34,79 @@ for n in range(total_samples):
 # print(y2)
 # print(y3)
 
-plt.figure()
-# plt.plot(x,x)
-plt.plot(time,data)
-# plt.plot(x,y2)
-# plt.plot(x,y3)
-plt.ylabel('more numbers')
+# plt.figure()
+# plt.plot(time,data)
+# plt.ylabel('more numbers')
+# plt.show()
 
-plt.show()
+# ------------------------------------------------------------------------------
+
+# Python example - Fourier transform using numpy.fft method
+import numpy as np
+import matplotlib.pyplot as plotter
+
+# How many time points are needed i,e., Sampling Frequency
+samplingFrequency   = 48000 # was 100
+
+# At what intervals time points are sampled
+samplingInterval       = 1 / samplingFrequency;
+
+# Begin time period of the signals
+beginTime           = 0
+
+# End time period of the signals
+endTime             = 10
+
+# Frequency of the signals
+signal1Frequency     = 20
+signal2Frequency     = 60
+
+# Time points
+time        = np.arange(beginTime, endTime, samplingInterval)
+
+# Create two sine waves
+amplitude1 = np.sin(2*np.pi*signal1Frequency*time)
+amplitude2 = np.sin(2*np.pi*signal2Frequency*time)
+
+# Add the sine waves
+amplitude = amplitude1 + amplitude2
+
+# for frame in amplitude:
+#     print(frame)
+
+# Frequency domain representation
+def return_FFT(amplitude=amplitude,samplingFrequency=samplingFrequency):
+    fourierTransform = np.fft.fft(amplitude)/len(amplitude)           # Normalize amplitude
+    fourierTransform = fourierTransform[range(int(len(amplitude)/2))] # Exclude sampling frequency
+
+    tpCount     = len(amplitude)
+    values      = np.arange(int(tpCount/2))
+    timePeriod  = tpCount/samplingFrequency
+    frequencies = values/timePeriod
+
+    return(frequencies,abs(fourierTransform))
+
+fft = return_FFT(amplitude=amplitude,samplingFrequency=samplingFrequency)
+
+# for i in range(len(frequencies)):
+#     print(frequencies[i],fourierTransform[i])
+
+# only give amplitues for specified frequencies
+# for i in range(len(frequencies)):
+#     if (frequencies[i] > 30 and frequencies[i] < 70):
+#         print(frequencies[i],abs(fourierTransform[i]))
+
+# Create subplot
+figure, axis = plotter.subplots(4, 1)
+plotter.subplots_adjust(hspace=1)
+
+axis[2].plot(time,amplitude)
+
+# Frequency domain representation
+axis[3].set_title('Fourier transform depicting the frequency components')
+# axis[3].plot(frequencies, abs(fourierTransform))
+axis[3].plot(fft[0], fft[1])
+axis[3].set_xlabel('Frequency')
+axis[3].set_ylabel('Amplitude')
+
+plotter.show()

@@ -36,6 +36,8 @@ from hsv2ansi import hsv2ansi
 
 fade = 5 # in milliseconds
 slow_hue = True
+min_brightness = 1 # default value - 1 (if this is 0 responsiveness might be impacted negatively)
+max_brightness = 65535*0.5 # default value - 65535
 vol_multiplier = 6 # 6 - Loud HQ music, 8 - Normal HQ Music or Spotify normalized to 'loud' enviroment, 10 - spotify normalize to 'normal'
 
 # ---- functions ----
@@ -64,6 +66,19 @@ def print_bar(_name,_val,_seg_active,_seg_inactive,_total_segments=100):
         lrString = "{}=[{}{}{}] ({})".format(_name,active_string, inactive_string, Style.RESET_ALL, int(_val*100))
 
         print(lrString)
+
+# Frequency domain representation
+# adapted code from https://pythontic.com/visualization/signals/fouriertransform_fft
+def return_FFT(amplitude,samplingFrequency):
+    fourierTransform = np.fft.fft(amplitude)/len(amplitude)           # Normalize amplitude
+    fourierTransform = fourierTransform[range(int(len(amplitude)/2))] # Exclude sampling frequency
+
+    tpCount     = len(amplitude)
+    values      = np.arange(int(tpCount/2))
+    timePeriod  = tpCount/samplingFrequency
+    frequencies = values/timePeriod
+
+    return(frequencies,abs(fourierTransform))
 
 # ---- classes ----
 
@@ -102,14 +117,34 @@ try:
 
     hue = 0 # float: 0 .. 1
 
+    i = 0
     while True:
 
         data = np.frombuffer(audio.stream.read(1024),dtype=np.int16)
+        # amplitude = np.frombuffer(audio.stream.read(1024),dtype=np.array)
 
-        dataL = data[0::2]
-        dataR = data[1::2]
-        peakL = np.abs(np.max(dataL)-np.min(dataL))/maxValue
-        peakR = np.abs(np.max(dataR)-np.min(dataR))/maxValue
+        # dataL = data[0::2]
+        # dataR = data[1::2]
+        # peakL = np.abs(np.max(dataL)-np.min(dataL))/maxValue
+        # peakR = np.abs(np.max(dataR)-np.min(dataR))/maxValue
+
+        # def redraw_figure():
+        #     plt.draw()
+        #     plt.pause(0.00001)
+        #
+        # print(data)
+        # import matplotlib.pyplot as plt
+        data_frames = len(data) # the number of frames in the captured audio data
+        time = np.arange(0,data_frames) # an array from 0 to the total number of frames captured for this loop
+        # figure, axis = plt.subplots(4, 1)
+        # print(type(time))
+        # print(type(data))
+        # axis[0].plot(time, data)
+        # # redraw_figure()
+        # i = i + 1
+        # if i > 2:
+        #     input()
+
 
         volume_norm = np.linalg.norm(data)*vol_multiplier # normalize audio level
         normLR = clamp((volume_norm / maxValue) / 100, 0, 1) # clamp audio level
@@ -127,14 +162,40 @@ try:
 
         active_segment.fore, active_segment.back = (hue_y_ansi)
         inactive_segment.fore, inactive_segment.back = (hue_y_ansi[0], Back.BLACK)
-        print_bar("normLR",normLR,active_segment,inactive_segment)
+        # print_bar("normLR",normLR,active_segment,inactive_segment)
         # print_bar("peakL",peakL,active_segment,inactive_segment)
         # print_bar("peakR",peakR,active_segment,inactive_segment)
+
+        active_bass = BarSegment("■") # todo: this is a bit wasteful, revise this later
+        inactive_bass = BarSegment("□")
+        active_bass.fore, active_segment.back = (Fore.BLACK, Back.WHITE)
+        inactive_bass.fore, inactive_segment.back = (Fore.WHITE, Back.BLACK)
+
+        fft_frequencies, fourierTransform = return_FFT(data, data_frames)
+
+        freq_count = 0
+        total_amp = 0
+
+        for i in range(len(fft_frequencies)):
+            if (fft_frequencies[i] >= 0 and fft_frequencies[i] <= 150):
+                freq_count += 1
+                total_amp += fourierTransform[i]
+
+            if (freq_count > 0):
+                average_amp = total_amp / freq_count
+            else:
+                average_amp = 0
+
+        print(average_amp,freq_count)
+        normLR = average_amp/data_frames
+        # print_bar("0-60Hz",normLR,active_bass,inactive_bass)
+        print_bar("0-60Hz",normLR,active_segment,inactive_segment)
+        # print_bar("normLR",normLR,active_segment,inactive_segment)
 
         # flash mode! (loud means bright!)
         h = 65535*hue_y
         s = 65535*math.cos(1-normLR) # inverse saturation - higher levels = lower saturation
-        v = 1 + ((65535-1)*normLR) # regular brightness
+        v = min_brightness + ((max_brightness-min_brightness)*normLR) # regular brightness
         k = 6500
 
         # whiteout mode!

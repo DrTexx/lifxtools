@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 seconds = 1 # the total number of seconds
 samplerate = 48000 # the number of data points per second
-freq = 20 # the frequency of the signal we're producing
+freq = 1 # the frequency of the signal we're producing
 
 time_between_samples = seconds / samplerate
 total_samples = seconds * samplerate
@@ -16,9 +16,9 @@ time = []
 data = []
 
 for n in range(total_samples):
-    seconds = n/samplerate
+    seconds = n / samplerate
     time.append(seconds)
-    data.append(math.cos(seconds))
+    data.append(math.cos(seconds*freq*(2*math.pi)))
 
 # y1 = []
 # y2 = []

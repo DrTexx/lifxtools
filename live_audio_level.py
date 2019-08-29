@@ -186,13 +186,14 @@ try:
             else:
                 average_amp = 0
 
-        print(average_amp,freq_count)
         normLR = average_amp/data_frames # todo: look into RMS (Root Mean
                                          # Squared) to potentially fix spikes
                                          # in bass while loud treble
         # print_bar("0-60Hz",normLR,active_bass,inactive_bass)
         print_bar("0-60Hz",normLR,active_segment,inactive_segment)
         # print_bar("normLR",normLR,active_segment,inactive_segment)
+
+        # print(average_amp,freq_count) # print reported average amplitude
 
         # flash mode! (loud means bright!)
         h = 65535*hue_y

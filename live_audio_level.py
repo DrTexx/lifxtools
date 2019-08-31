@@ -34,7 +34,7 @@ from hsv2ansi import hsv2ansi
 
 # ---- settings ----
 
-fade = 5 # in milliseconds
+fade = 0 # in milliseconds
 slow_hue = True
 min_brightness = 1 # default value - 1 (if this is 0 responsiveness might be impacted negatively)
 max_brightness = 65535*0.5 # default value - 65535
@@ -103,9 +103,21 @@ class Audio:
 
 lifx = lifxtools.return_interface(None)
 lights = lifx.get_lights()
+tilechains = lifx.get_tilechain_lights()
 managedLights = lifxtools.create_managed_lights(lights)
 
 lifxtools.prepare_managedLights(managedLights)
+
+amount = 0
+for tc_n in range(len(tilechains)):
+    tc = tilechains[tc_n].get_tilechain_colors()
+
+    for t_n in range(len(tc)):
+        print("tilechain #{} - tile #{} - {}".format(tc_n,t_n,tc[t_n]))
+
+    amount = amount + 1
+
+print(amount)
 
 try:
     maxValue = 2**16
@@ -146,8 +158,9 @@ try:
         #     input()
 
 
-        volume_norm = np.linalg.norm(data)*vol_multiplier # normalize audio level
-        normLR = clamp((volume_norm / maxValue) / 100, 0, 1) # clamp audio level
+        volume_norm = np.linalg.norm(data) # normalize audio level
+        volume_norm_multiplied = volume_norm*vol_multiplier
+        normLR = clamp((volume_norm_multiplied / maxValue) / 100, 0, 1) # clamp audio level
 
         volume_cycle_impact = 1 # number is the amount of time to skip into the future of the hue cycle when the volume is loud
 
@@ -186,12 +199,13 @@ try:
             else:
                 average_amp = 0
 
-        normLR = average_amp/data_frames # todo: look into RMS (Root Mean
+        # normLR = average_amp/data_frames # todo: look into RMS (Root Mean
                                          # Squared) to potentially fix spikes
                                          # in bass while loud treble
         # print_bar("0-60Hz",normLR,active_bass,inactive_bass)
-        print_bar("0-60Hz",normLR,active_segment,inactive_segment)
-        # print_bar("normLR",normLR,active_segment,inactive_segment)
+        # print_bar("0-60Hz",normLR,active_segment,inactive_segment)
+
+        print_bar("normLR",normLR,active_segment,inactive_segment)
 
         # print(average_amp,freq_count) # print reported average amplitude
 

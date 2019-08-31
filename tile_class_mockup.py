@@ -1,4 +1,5 @@
 import numpy as np
+import lifxlan
 
 # ---- classes ----
 
@@ -24,6 +25,13 @@ class TileFrame:
 
     def print_frame(self):
         print(self.frame)
+
+    def return_frame(self):
+        frame = []
+        for y in self.frame:
+            for x in y:
+                frame.append(x)
+        return(frame)
 
 # ---- settings (for script) ----
 
@@ -51,3 +59,9 @@ my_frame.frame[0][1] = color_a
 my_frame.print_frame()
 
 # ---- lifx ----
+lifx = lifxlan.LifxLAN()
+tilechains = lifx.get_tilechain_lights()
+
+for tilechain in tilechains:
+    # tilechain.set_tile_colors(start_index, colors, [duration], [tile_count], [x], [y], [width], [rapid])
+    tilechain.set_tile_colors(0, my_frame.return_frame(), 0)

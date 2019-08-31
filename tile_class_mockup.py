@@ -1,3 +1,4 @@
+import lifxtools
 import numpy as np
 import lifxlan
 from time import sleep
@@ -42,36 +43,38 @@ color_a = (0,65535,65535,6500)
 # ---- script ----
 
 # instantiate a frame object
-frame_1 = TileFrame(x_size,y_size)
-frame_2 = TileFrame(x_size,y_size)
-
-frame_1.print_frame() # print frame data to CLI
-frame_2.print_frame() # print frame data to CLI
+frame1 = TileFrame(x_size,y_size)
 
 # set a each pixel of frame based on these conditions
-for y in range(frame_1.y_size):
-    for x in range(frame_1.x_size):
-        if (y % 2 == 0):
-            if (x % 2 == 0):
-                frame_1.set_pixel(x,y,color_a)
+for y in range(frame1.y_size):
+    for x in range(frame1.x_size):
 
-# set a each pixel of frame based on these conditions
-for y in range(frame_2.y_size):
-    for x in range(frame_2.x_size):
-        if not (y % 2 == 0):
-            if not (x % 2 == 0):
-                frame_2.set_pixel(x,y,color_a)
+        x_perc = x/frame1.x_size
+        y_perc = y/frame1.y_size
 
-frame_1.print_frame() # print frame data to CLI
-frame_2.print_frame() # print frame data to CLI
+        h = 65535 * x_perc
+        s = 65535
+        v = 65535 * y_perc
+        k = 6500
 
-frames = [frame_1, frame_2]
+        color = (h, s, v, k)
+        frame1.set_pixel(x,y,color)
+
+frame1.print_frame() # print frame data to CLI
+
+frames = [frame1]
 
 # ---- lifx ----
 lifx = lifxlan.LifxLAN()
 tilechains = lifx.get_tilechain_lights()
 
 # tilechain.set_tile_colors(start_index, colors, [duration], [tile_count], [x], [y], [width], [rapid])
+
+min_brightness = 0
+max_brightness = 65535
+segs_brightness = 20
+
+
 
 while True:
     for frame in frames:

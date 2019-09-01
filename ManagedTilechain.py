@@ -50,16 +50,8 @@ class ManagedTilechain:
 
     def read_HSVK_tiles(self):
 
-        HSVK_list = []
-
-        # for each cell of self.canvas
-        for y in self.canvas:
-            for x in y:
-                # store the output of cell.read() in 1D array
-                HSVK_list.append(x)
-
         # convert the 1D array to a 2D array of 64 pixels per tile
-        HSVK_tiles = np.reshape(HSVK_list, (self.num_tiles, 64, 4))
+        HSVK_tiles = np.reshape(self.canvas, (self.num_tiles, 64, 4))
 
         return(HSVK_tiles)
 
@@ -86,13 +78,9 @@ class ManagedTilechain:
         HSVK_tiles = self.read_HSVK_tiles()
         self.TileChain.set_tilechain_colors(HSVK_tiles,fade,rapid=rapid)
 
-    def paint_pixel(self,color,x,y,update_device=False):
+    def paint_pixel(self,color,x,y):
 
         self.canvas[y][x] = color
-
-        if (update_device == True):
-
-            self.update_tilechain()
 
 # ---- script ----
 if __name__ == "__main__":

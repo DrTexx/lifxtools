@@ -3,6 +3,18 @@ import numpy as np
 import lifxlan
 from time import sleep
 
+r = lifxlan.RED
+g = lifxlan.GREEN
+b = lifxlan.BLUE
+
+# ---- functions ----
+
+def shift_y(tilechain):
+    canvas_dimensions = tilechain.get_canvas_dimensions()
+    tile_map = tilechain.get_tile_map()
+    tilechain.project_matrix(matrix)
+    input()
+
 # ---- classes ----
 
 class TileFrame:
@@ -54,30 +66,63 @@ for y in range(frame1.y_size):
 
         h = 65535 * x_perc
         s = 65535
-        v = 65535 * y_perc
+        v = (65535*0.25) * y_perc
         k = 6500
 
         color = (h, s, v, k)
         frame1.set_pixel(x,y,color)
 
-frame1.print_frame() # print frame data to CLI
+frame2 = TileFrame(x_size,y_size)
 
-frames = [frame1]
+# set a each pixel of frame based on these conditions
+for y in range(frame2.y_size):
+    for x in range(frame2.x_size):
+
+        x_perc = x/frame2.x_size
+        y_perc = y/frame2.y_size
+
+        h = 65535 * x_perc
+        s = 65535
+        v = 65535 * 0.25
+        k = 6500
+
+        color = (h, s, v, k)
+        frame2.frame[x][y] = color
+
+frames = [frame1,frame2]
+
+# for frame in frames:
+#     frame.print_frame() # print frame data to CLI
 
 # ---- lifx ----
 lifx = lifxlan.LifxLAN()
-tilechains = lifx.get_tilechain_lights()
+tilechain = lifx.get_tilechain_lights()[0]
+num_tiles = tilechain.get_tile_count()
 
 # tilechain.set_tile_colors(start_index, colors, [duration], [tile_count], [x], [y], [width], [rapid])
 
-min_brightness = 0
-max_brightness = 65535
-segs_brightness = 20
+hue_matrix = np.array([
+    [0,1,2,0,1,2,0,1,2,0,1,2,0,1,2,0],
+    [r,r,r,r,r,r,r,r,r,r,r,r,r,r,r,r],
+    [r,r,r,r,r,r,r,r,r,r,r,r,r,r,r,r],
+    [r,r,r,r,r,r,r,r,r,r,r,r,r,r,r,r],
+    [r,r,r,r,r,r,r,r,r,r,r,r,r,r,r,r],
+    [r,r,r,r,r,r,r,r,r,r,r,r,r,r,r,r],
+    [r,r,r,r,r,r,r,r,r,r,r,r,r,r,r,r],
+    [r,r,r,r,r,r,r,r,r,r,r,r,r,r,r,r]
+])
 
+while True:
+    for n in range(50):
+        matrix = np.roll(matrix,1)
+        shift_y(tilechain)
+        sleep(0.1)
+
+input("waiting for input to continue...")
 
 
 while True:
-    for frame in frames:
-        for tilechain in tilechains:
-            tilechain.set_tile_colors(0, frame.return_frame(), 0, rapid=True)
+    for f in range(len(frames)):
+        tilechain.set_tile_colors(0, frames[f-1].return_frame(), 0, rapid=True)
+        tilechain.set_tile_colors(1, frames[f].return_frame(), 0, rapid=True)
         sleep(0.1)

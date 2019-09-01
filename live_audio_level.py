@@ -24,6 +24,7 @@
 
 import numpy as np
 import lifxtools
+from ManagedTilechain import ManagedTilechain
 import math
 
 from colorama import init
@@ -37,7 +38,7 @@ from hsv2ansi import hsv2ansi
 fade = 0 # in milliseconds
 slow_hue = True
 min_brightness = 1 # default value - 1 (if this is 0 responsiveness might be impacted negatively)
-max_brightness = 65535*0.5 # default value - 65535
+max_brightness = 65535*0.5   # default value - 65535
 vol_multiplier = 6 # 6 - Loud HQ music, 8 - Normal HQ Music or Spotify normalized to 'loud' enviroment, 10 - spotify normalize to 'normal'
 
 # ---- functions ----
@@ -102,22 +103,14 @@ class Audio:
 # ---- script ----
 
 lifx = lifxtools.return_interface(None)
-lights = lifx.get_lights()
-tilechains = lifx.get_tilechain_lights()
+lights = lifx.get_devices_by_group("Office").get_device_list()
+# lights = [lifx.get_device_by_name("Proto Tile")]
 managedLights = lifxtools.create_managed_lights(lights)
-
 lifxtools.prepare_managedLights(managedLights)
 
-amount = 0
-for tc_n in range(len(tilechains)):
-    tc = tilechains[tc_n].get_tilechain_colors()
-
-    for t_n in range(len(tc)):
-        print("tilechain #{} - tile #{} - {}".format(tc_n,t_n,tc[t_n]))
-
-    amount = amount + 1
-
-print(amount)
+tilechains = lifx.get_tilechain_lights()
+tilechain = tilechains[0]
+m_tc = ManagedTilechain(tilechain)
 
 try:
     maxValue = 2**16
@@ -227,7 +220,39 @@ try:
         # v = 65535*(1-normLR) # inverse brightness - higher levels = lower brightness
         # k = 6500
 
-        set_lights(h,s,v,k,fade,True)
+        # for light in lights:
+        #     light.set_color((h,s,v,k),fade,True)
+
+        tilechain_colors = tilechain.get_tilechain_colors()
+        for tile_colors in tilechain_colors:
+            print("tile_colors",tile_colors)
+
+        # set cell [0][0] to HSVK full red
+        m_tc.canvas[0][0].write( (65535, 65535, 65535, 6500) )
+
+        # get 2D array with HSVK values
+        HSVK_2D = m_tc.read_HSVK_2D()
+
+        # print data relating to each pixel in the HSVK_2D array
+        # todo: put this into a function later
+        n = 0
+        for y in range(len(HSVK_2D)):
+            for x in range(len(HSVK_2D[y])):
+                print("pixel:{} x-index:{} y-index:{} color:{}".format(n,x,y,HSVK_2D[y][x]))
+                n += 1
+
+        # get 2D with pixel for each tile
+        HSVK_tiles = m_tc.read_HSVK_tiles()
+
+        print(HSVK_tiles)
+
+        # print 2D tile pixels array:
+        for tile in range(len(HSVK_tiles)):
+            for pixel in range(len(HSVK_tiles[tile])):
+                print("tile:{} pixel:{} HSVK:{}".format(tile,pixel,HSVK_tiles[tile][pixel]))
+
+        # set HSVK values
+        tilechain.set_tilechain_colors(HSVK_tiles)
 
         if (hue < 1):
             if (slow_hue == True): hue += 0.001

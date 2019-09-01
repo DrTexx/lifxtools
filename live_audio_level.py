@@ -228,7 +228,7 @@ try:
             print("tile_colors",tile_colors)
 
         # set cell [0][0] to HSVK full red
-        m_tc.canvas[0][0].write( (65535, 65535, 65535, 6500) )
+        m_tc.canvas[0][0] = (65535, 65535, 65535, 6500)
 
         # get 2D array with HSVK values
         HSVK_2D = m_tc.read_HSVK_2D()

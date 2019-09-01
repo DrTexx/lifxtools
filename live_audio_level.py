@@ -26,6 +26,7 @@ import numpy as np
 import lifxtools
 from ManagedTilechain import ManagedTilechain
 import math
+from time import sleep
 
 from colorama import init
 init()
@@ -123,6 +124,10 @@ try:
     hue = 0 # float: 0 .. 1
 
     i = 0
+    y = 0
+    x = 0
+    y_max = len(m_tc.canvas) - 1
+    x_max = len(m_tc.canvas[0]) - 1
     while True:
 
         data = np.frombuffer(audio.stream.read(1024),dtype=np.int16)
@@ -223,25 +228,23 @@ try:
         # for light in lights:
         #     light.set_color((h,s,v,k),fade,True)
 
-        # set cell [0][0] to HSVK full red
-        for y in range(len(m_tc.canvas)):
-            for x in range(len(m_tc.canvas[y])):
-                m_tc.canvas[y][x] = (65535, 65535, 65535, 6500)
-                HSVK_tiles = m_tc.read_HSVK_tiles()
-                tilechain.set_tilechain_colors(HSVK_tiles,0,rapid=True)
+        # paint by pixel index - do for each music sample taken
+        # pixel_color = (65535, 65535, 65535, 6500)
+        pixel_color = (h, s, v, k)
 
-        # print both representations of multi-dimension HSVK arrays
-        print("HSVK_2D")
-        m_tc.print_HSVK_2D()
+        # paint pixel at x,y
+        m_tc.paint_pixel(pixel_color, x, y)
+        m_tc.update_tilechain()
 
-        print("HSVK_tiles")
-        m_tc.print_HSVK_tiles()
-
-        # get 2D array in order of [tile][pixel_n]
-        HSVK_tiles = m_tc.read_HSVK_tiles()
-
-        # set HSVK values
-        tilechain.set_tilechain_colors(HSVK_tiles)
+        # increase x or y as needed
+        if (y < y_max): # if x is not maxed
+            if (x < x_max):
+                x += 1 # add 1 to y
+            else:
+                y += 1
+                x = 0
+        else:
+            y = 0
 
         if (hue < 1):
             if (slow_hue == True): hue += 0.001

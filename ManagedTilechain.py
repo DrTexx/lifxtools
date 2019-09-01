@@ -23,6 +23,7 @@ class ManagedTilechain:
         self.size = TileChain_Object.get_canvas_dimensions()
         self.size_all_values = (self.size[0], self.size[1], 4)
         self.num_tiles = TileChain_Object.get_tile_count()
+        self.num_pixels = ( (self.size[0] + 1) * (self.size[1] + 1) * 4) - 1
         self.off_pixel = (0,0,0,6500)
         self.canvas = self._gen_empty_frame()
 
@@ -80,6 +81,18 @@ class ManagedTilechain:
             for pixel in range(len(HSVK_tiles[tile])):
                 print("tile:{} pixel:{} HSVK:{}".format(tile,pixel,HSVK_tiles[tile][pixel]))
 
+    def update_tilechain(self,fade=0,rapid=True):
+
+        HSVK_tiles = self.read_HSVK_tiles()
+        self.TileChain.set_tilechain_colors(HSVK_tiles,fade,rapid=rapid)
+
+    def paint_pixel(self,color,x,y,update_device=False):
+
+        self.canvas[y][x] = color
+
+        if (update_device == True):
+
+            self.update_tilechain()
 
 # ---- script ----
 if __name__ == "__main__":

@@ -272,6 +272,8 @@ try:
         pixel_color = (h, s, v, k)
 
         # paint pixel at x,y
+        # m_tc.paint_pixel(pixel_color, x, y)
+        # m_tc.update_tilechain()
         m_tc.paint_pixel(pixel_color, x, y)
         m_tc.update_tilechain()
 

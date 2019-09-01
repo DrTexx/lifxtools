@@ -82,6 +82,19 @@ class ManagedTilechain:
 
         self.canvas[y][x] = color
 
+    def paint_line(self,color,dimension,index):
+
+        if (dimension == 'x'):
+            for x in range(self.size[0]):
+                self.canvas[index][x] = color
+
+        elif (dimension == 'y'):
+            for y in range(len(self.canvas)):
+                self.canvas[y][index] = color
+
+        else:
+            raise Exception("dimension must be either the string 'x' or 'y', not {}".format(str(dimension)))
+
 # ---- script ----
 if __name__ == "__main__":
     lifx = lifxlan.LifxLAN()

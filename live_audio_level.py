@@ -26,7 +26,6 @@ import numpy as np
 import lifxtools
 from ManagedTilechain import ManagedTilechain
 import math
-from time import sleep
 
 from colorama import init
 init()
@@ -69,7 +68,7 @@ def print_bar(_name,_val,_seg_active,_seg_inactive,_total_segments=100):
 
         print(lrString)
 
-# Frequency domain representation
+        # Frequency domain representation
 # adapted code from https://pythontic.com/visualization/signals/fouriertransform_fft
 def return_FFT(amplitude,samplingFrequency):
     fourierTransform = np.fft.fft(amplitude)/len(amplitude)           # Normalize amplitude
@@ -81,6 +80,31 @@ def return_FFT(amplitude,samplingFrequency):
     frequencies = values/timePeriod
 
     return(frequencies,abs(fourierTransform))
+
+# def callback(in_data, frame_count, time_info, status):
+#     data = np.frombuffer(audio.stream.read(1024),dtype=np.int16)
+#     return (data, pyaudio.paContinue)
+
+fulldata = np.array([])
+
+def callback(in_data, frame_count, time_info, flag):
+    global b,a,fulldata #global variables for filter coefficients and array
+    data = np.frombuffer(in_data, dtype=np.float32)
+
+    #do whatever with data, in my case I want to hear my data filtered in realtime
+    print("reading!")
+    # data = signal.filtfilt(b,a,data,padlen=200).astype(np.float32).tostring()
+
+    fulldata = np.append(fulldata,data) #saves filtered data in an array
+    return (data, pyaudio.paContinue)
+
+# def callback(in_data, frame_count, time_info, flag):
+#     global b,a,fulldata #global variables for filter coefficients and array
+#     audio_data = np.fromstring(in_data, dtype=np.float32)
+#     #do whatever with data, in my case I want to hear my data filtered in realtime
+#     audio_data = signal.filtfilt(b,a,audio_data,padlen=200).astype(np.float32).tostring()
+#     fulldata = np.append(fulldata,audio_data) #saves filtered data in an array
+#     return (audio_data, pyaudio.paContinue)
 
 # ---- classes ----
 
@@ -94,13 +118,6 @@ class BarSegment:
     def gen_segments(self,amount):
         return(self.fore + self.back + self.symbol * amount + Style.RESET_ALL)
 
-class Audio:
-
-    def __init__(self):
-        import pyaudio
-        self.pa = pyaudio.PyAudio()
-        self.stream = self.pa.open(format=pyaudio.paInt16, channels=2, rate=44100, input=True, frames_per_buffer=1024)
-
 # ---- script ----
 
 lifx = lifxtools.return_interface(None)
@@ -113,13 +130,34 @@ tilechains = lifx.get_tilechain_lights()
 tilechain = tilechains[0]
 m_tc = ManagedTilechain(tilechain)
 
+g_data = np.array([])
+
+def callback(in_data, frame_count, time_info, flag):
+    global g_data #global variables for filter coefficients and array
+    # data = np.frombuffer(stream.read(1024),dtype=np.int16,exception_on_overflow=False)
+    audio_data = np.frombuffer(in_data, dtype=np.int16)
+    #do whatever with data, in my case I want to hear my data filtered in realtime
+    # audio_data = signal.filtfilt(b,a,audio_data,padlen=200).astype(np.float32).tostring()
+    g_data = audio_data #saves filtered data in an array
+    return (audio_data, pyaudio.paContinue)
+
+import pyaudio
+pa = pyaudio.PyAudio()
+stream = pa.open(
+    format=pyaudio.paInt16,
+    channels=2,
+    rate=44100,
+    input=True,
+    stream_callback=callback
+)
+stream.start_stream()
+
 try:
     maxValue = 2**16
 
     active_segment = BarSegment("■") # todo: this is a bit wasteful, revise this later
     inactive_segment = BarSegment("□")
 
-    audio = Audio()
 
     hue = 0 # float: 0 .. 1
 
@@ -128,9 +166,9 @@ try:
     x = 0
     y_max = len(m_tc.canvas) - 1
     x_max = len(m_tc.canvas[0]) - 1
-    while True:
-
-        data = np.frombuffer(audio.stream.read(1024),dtype=np.int16)
+    while stream.is_active():
+        # data = np.frombuffer(stream.read(1024),dtype=np.int16,exception_on_overflow=False)
+        data = g_data
         # amplitude = np.frombuffer(audio.stream.read(1024),dtype=np.array)
 
         # dataL = data[0::2]
@@ -182,20 +220,20 @@ try:
         active_bass.fore, active_segment.back = (Fore.BLACK, Back.WHITE)
         inactive_bass.fore, inactive_segment.back = (Fore.WHITE, Back.BLACK)
 
-        fft_frequencies, fourierTransform = return_FFT(data, data_frames)
-
-        freq_count = 0
-        total_amp = 0
-
-        for i in range(len(fft_frequencies)):
-            if (fft_frequencies[i] >= 0 and fft_frequencies[i] <= 150):
-                freq_count += 1
-                total_amp += fourierTransform[i]
-
-            if (freq_count > 0):
-                average_amp = total_amp / freq_count
-            else:
-                average_amp = 0
+        # fft_frequencies, fourierTransform = return_FFT(data, data_frames)
+        #
+        # freq_count = 0
+        # total_amp = 0
+        #
+        # for i in range(len(fft_frequencies)):
+        #     if (fft_frequencies[i] >= 0 and fft_frequencies[i] <= 150):
+        #         freq_count += 1
+        #         total_amp += fourierTransform[i]
+        #
+        #     if (freq_count > 0):
+        #         average_amp = total_amp / freq_count
+        #     else:
+        #         average_amp = 0
 
         # normLR = average_amp/data_frames # todo: look into RMS (Root Mean
                                          # Squared) to potentially fix spikes
@@ -229,22 +267,45 @@ try:
         #     light.set_color((h,s,v,k),fade,True)
 
         # paint by pixel index - do for each music sample taken
-        # pixel_color = (65535, 65535, 65535, 6500)
-        pixel_color = (h, s, v, k)
+        # pixel_color = (0, 0, 0, 6500)
 
         # paint pixel at x,y
-        m_tc.paint_pixel(pixel_color, x, y)
+        # pixel_color = (65535*hue, 65535*1, 65535*normLR, 6500)
+        # m_tc.paint_pixel(pixel_color, x, y)
+        # if (y < y_max): # if x is not maxed
+        #     if (x < x_max):
+        #         x += 1 # add 1 to y
+        #     else:
+        #         y += 1
+        #         x = 0
+        # else:
+        #     y = 0
+
+        # scan amplitude along x
+        # pixel_color = (65535*hue_y, 65535*normLR, (65535*0.1)+(65535*0.9)*normLR, 6500)
+        # pixel_white = (0, 0, (65535*0.1)+(65535*0.9)*normLR, 6500)
+        # m_tc.paint_line(pixel_color,'x',y-1)
+        # m_tc.paint_line(pixel_white,'x',y)
+        # if (y < y_max):
+        #     y += 1
+        # else:
+        #     y = 0
+
+        pixel_color = (65535*hue, 65535*1, 65535*normLR, 6500)
+        pixel_empty = (0, 0, 0, 6500)
+        # m_tc.canvas = np.roll(m_tc.canvas, 1, axis=1) # shift canvas on axis
+        # m_tc.canvas = m_tc._gen_empty_frame()
+        m_tc.paint_line(pixel_color,'y',0) # paint line on side of canvas
+        # m_tc.paint_line(pixel_color,'y',7) # paint line on side of canvas
+        # # m_tc.paint_line(pixel_empty,'y',1)
+        # # m_tc.paint_line(pixel_empty,'x',2)
+        # # m_tc.paint_line(pixel_empty,'x',3)
+        # # m_tc.paint_line(pixel_empty,'x',4)
+        # # m_tc.paint_line(pixel_empty,'x',5)
+
         m_tc.update_tilechain()
 
         # increase x or y as needed
-        if (y < y_max): # if x is not maxed
-            if (x < x_max):
-                x += 1 # add 1 to y
-            else:
-                y += 1
-                x = 0
-        else:
-            y = 0
 
         if (hue < 1):
             if (slow_hue == True): hue += 0.001
@@ -256,4 +317,7 @@ try:
         # print("L:%00.02f R:%00.02f"%(peakL*100, peakR*100))
 finally:
     lifxtools.restore_managedLights(managedLights)
+    stream.stop_stream()
+    stream.close()
+    pa.terminate()
     Style.RESET_ALL

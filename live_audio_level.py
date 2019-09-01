@@ -223,33 +223,22 @@ try:
         # for light in lights:
         #     light.set_color((h,s,v,k),fade,True)
 
-        tilechain_colors = tilechain.get_tilechain_colors()
-        for tile_colors in tilechain_colors:
-            print("tile_colors",tile_colors)
-
         # set cell [0][0] to HSVK full red
-        m_tc.canvas[0][0] = (65535, 65535, 65535, 6500)
+        for y in range(len(m_tc.canvas)):
+            for x in range(len(m_tc.canvas[y])):
+                m_tc.canvas[y][x] = (65535, 65535, 65535, 6500)
+                HSVK_tiles = m_tc.read_HSVK_tiles()
+                tilechain.set_tilechain_colors(HSVK_tiles,0,rapid=True)
 
-        # get 2D array with HSVK values
-        HSVK_2D = m_tc.read_HSVK_2D()
+        # print both representations of multi-dimension HSVK arrays
+        print("HSVK_2D")
+        m_tc.print_HSVK_2D()
 
-        # print data relating to each pixel in the HSVK_2D array
-        # todo: put this into a function later
-        n = 0
-        for y in range(len(HSVK_2D)):
-            for x in range(len(HSVK_2D[y])):
-                print("pixel:{} x-index:{} y-index:{} color:{}".format(n,x,y,HSVK_2D[y][x]))
-                n += 1
+        print("HSVK_tiles")
+        m_tc.print_HSVK_tiles()
 
-        # get 2D with pixel for each tile
+        # get 2D array in order of [tile][pixel_n]
         HSVK_tiles = m_tc.read_HSVK_tiles()
-
-        print(HSVK_tiles)
-
-        # print 2D tile pixels array:
-        for tile in range(len(HSVK_tiles)):
-            for pixel in range(len(HSVK_tiles[tile])):
-                print("tile:{} pixel:{} HSVK:{}".format(tile,pixel,HSVK_tiles[tile][pixel]))
 
         # set HSVK values
         tilechain.set_tilechain_colors(HSVK_tiles)

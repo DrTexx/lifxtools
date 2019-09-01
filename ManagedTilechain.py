@@ -62,6 +62,25 @@ class ManagedTilechain:
 
         return(HSVK_tiles)
 
+    def print_HSVK_2D(self):
+
+        # print data relating to each pixel in the HSVK_2D array
+        HSVK_2D = self.read_HSVK_2D()
+        n = 0
+        for y in range(len(HSVK_2D)):
+            for x in range(len(HSVK_2D[y])):
+                print("pixel:{} x-index:{} y-index:{} color:{}".format(n,x,y,HSVK_2D[y][x]))
+                n += 1
+
+    def print_HSVK_tiles(self):
+
+        # print 2D tile pixels array
+        HSVK_tiles = self.read_HSVK_tiles()
+        for tile in range(len(HSVK_tiles)):
+            for pixel in range(len(HSVK_tiles[tile])):
+                print("tile:{} pixel:{} HSVK:{}".format(tile,pixel,HSVK_tiles[tile][pixel]))
+
+
 # ---- script ----
 if __name__ == "__main__":
     lifx = lifxlan.LifxLAN()

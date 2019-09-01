@@ -136,7 +136,7 @@ g_data = np.array([])
 def callback(in_data, frame_count, time_info, flag):
     global g_data #global variables for filter coefficients and array
     # data = np.frombuffer(stream.read(1024),dtype=np.int16,exception_on_overflow=False)
-    audio_data = np.fromstring(in_data, dtype=np.int16,exception_on_overflow=False)
+    audio_data = np.fromstring(in_data, dtype=np.int16)
     #do whatever with data, in my case I want to hear my data filtered in realtime
     # audio_data = signal.filtfilt(b,a,audio_data,padlen=200).astype(np.float32).tostring()
     g_data = audio_data #saves filtered data in an array
@@ -221,20 +221,20 @@ try:
         active_bass.fore, active_segment.back = (Fore.BLACK, Back.WHITE)
         inactive_bass.fore, inactive_segment.back = (Fore.WHITE, Back.BLACK)
 
-        fft_frequencies, fourierTransform = return_FFT(data, data_frames)
-
-        freq_count = 0
-        total_amp = 0
-
-        for i in range(len(fft_frequencies)):
-            if (fft_frequencies[i] >= 0 and fft_frequencies[i] <= 150):
-                freq_count += 1
-                total_amp += fourierTransform[i]
-
-            if (freq_count > 0):
-                average_amp = total_amp / freq_count
-            else:
-                average_amp = 0
+        # fft_frequencies, fourierTransform = return_FFT(data, data_frames)
+        #
+        # freq_count = 0
+        # total_amp = 0
+        #
+        # for i in range(len(fft_frequencies)):
+        #     if (fft_frequencies[i] >= 0 and fft_frequencies[i] <= 150):
+        #         freq_count += 1
+        #         total_amp += fourierTransform[i]
+        #
+        #     if (freq_count > 0):
+        #         average_amp = total_amp / freq_count
+        #     else:
+        #         average_amp = 0
 
         # normLR = average_amp/data_frames # todo: look into RMS (Root Mean
                                          # Squared) to potentially fix spikes

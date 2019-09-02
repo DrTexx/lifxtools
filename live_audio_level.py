@@ -24,6 +24,7 @@
 
 import numpy as np
 import lifxtools
+from time import sleep
 from ManagedTilechain import ManagedTilechain
 import math
 
@@ -40,6 +41,8 @@ slow_hue = True
 min_brightness = 1 # default value - 1 (if this is 0 responsiveness might be impacted negatively)
 max_brightness = 65535*0.5   # default value - 65535
 vol_multiplier = 6 # 6 - Loud HQ music, 8 - Normal HQ Music or Spotify normalized to 'loud' enviroment, 10 - spotify normalize to 'normal'
+update_Hz = 120 # 120 is default, low-spec PC's need lower Hz, light can't handle Hz too high and crash intermitently
+                # note: tilechains take a lot more processing power to do realtime music-vis
 
 # ---- functions ----
 
@@ -121,14 +124,26 @@ class BarSegment:
 # ---- script ----
 
 lifx = lifxtools.return_interface(None)
-lights = lifx.get_devices_by_group("Office").get_device_list()
+lights = lifx.get_devices()
+# lights = lifx.get_devices_by_group("Office").get_device_list()
 # lights = [lifx.get_device_by_name("Proto Tile")]
+tilechains = lifx.get_tilechain_lights()
+
+# remove tilechains from normal light list
+for light_n in range(len(lights)):
+    if (lights[light_n] in tilechains):
+        lights.remove(lights[light_n])
+
+# create and prepare (save state of) managed lights
 managedLights = lifxtools.create_managed_lights(lights)
 lifxtools.prepare_managedLights(managedLights)
 
-tilechains = lifx.get_tilechain_lights()
-tilechain = tilechains[0]
-m_tc = ManagedTilechain(tilechain)
+# set flag true if there are any tilechains found
+tilechains_present = len(tilechains) > 0
+
+if (tilechains_present == True):
+    tilechain = tilechains[0]
+    m_tc = ManagedTilechain(tilechain)
 
 g_data = np.array([])
 
@@ -164,8 +179,10 @@ try:
     i = 0
     y = 0
     x = 0
-    y_max = len(m_tc.canvas) - 1
-    x_max = len(m_tc.canvas[0]) - 1
+    if (tilechains_present == True):
+        y_max = len(m_tc.canvas) - 1
+        x_max = len(m_tc.canvas[0]) - 1
+
     while stream.is_active():
         # data = np.frombuffer(stream.read(1024),dtype=np.int16,exception_on_overflow=False)
         data = g_data
@@ -249,6 +266,7 @@ try:
         h = 65535*hue_y
         s = 65535*math.cos(1-normLR) # inverse saturation - higher levels = lower saturation
         v = min_brightness + ((max_brightness-min_brightness)*normLR) # regular brightness
+        # v = 65535*0.5
         k = 6500
 
         # whiteout mode!
@@ -263,8 +281,8 @@ try:
         # v = 65535*(1-normLR) # inverse brightness - higher levels = lower brightness
         # k = 6500
 
-        # for light in lights:
-        #     light.set_color((h,s,v,k),fade,True)
+        for light in lights:
+            light.set_color((h,s,v,k),fade,True)
 
         # paint by pixel index - do for each music sample taken
         # pixel_color = (0, 0, 0, 6500)
@@ -291,22 +309,24 @@ try:
         # else:
         #     y = 0
 
-        pixel_color = (65535*hue, 65535*1, 65535*normLR, 6500)
-        pixel_empty = (0, 0, 0, 6500)
-        # m_tc.canvas = np.roll(m_tc.canvas, 1, axis=1) # shift canvas on axis
-        # m_tc.canvas = m_tc._gen_empty_frame()
-        m_tc.paint_line(pixel_color,'y',0) # paint line on side of canvas
-        # m_tc.paint_line(pixel_color,'y',7) # paint line on side of canvas
-        # # m_tc.paint_line(pixel_empty,'y',1)
-        # # m_tc.paint_line(pixel_empty,'x',2)
-        # # m_tc.paint_line(pixel_empty,'x',3)
-        # # m_tc.paint_line(pixel_empty,'x',4)
-        # # m_tc.paint_line(pixel_empty,'x',5)
+        if (tilechains_present == True):
+            pixel_color = (65535*hue, 65535*1, 65535*normLR, 6500)
+            pixel_empty = (0, 0, 0, 6500)
+            # m_tc.canvas = np.roll(m_tc.canvas, 1, axis=1) # shift canvas on axis
+            # m_tc.canvas = m_tc._gen_empty_frame()
+            m_tc.paint_line(pixel_color,'y',0) # paint line on side of canvas
+            # m_tc.paint_line(pixel_color,'y',7) # paint line on side of canvas
+            # # m_tc.paint_line(pixel_empty,'y',1)
+            # # m_tc.paint_line(pixel_empty,'x',2)
+            # # m_tc.paint_line(pixel_empty,'x',3)
+            # # m_tc.paint_line(pixel_empty,'x',4)
+            # # m_tc.paint_line(pixel_empty,'x',5)
 
-        m_tc.update_tilechain()
+            m_tc.update_tilechain()
 
-        # increase x or y as needed
+        sleep(1/update_Hz)
 
+        # increment or reset hue
         if (hue < 1):
             if (slow_hue == True): hue += 0.001
             elif (slow_hue == False): hue += 0.01

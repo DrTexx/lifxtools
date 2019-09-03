@@ -162,7 +162,7 @@ scan_methods = {
 }
 
 @d_benchmark
-def scan_set_loop(_scan_method,_sample_size,_lights,_monitor_num,_factor,_fade_mode,_monitor_color_temp,_max_brightness):
+def scan_set_loop(_scan_method,_sample_size,_lights,_monitor_num,_factor,_fade_mode,_monitor_color_temp,_min_brightness,_max_brightness):
 
     # get a screengrab of the selected monitor/s
     img = return_screengrab(_monitor_num)
@@ -183,7 +183,15 @@ def scan_set_loop(_scan_method,_sample_size,_lights,_monitor_num,_factor,_fade_m
     h, s, v, k = rgbk2hsvk (r, g, b, _monitor_color_temp)
 
     # adjust the colours to user preferences
-    color = (h, s, v*(_max_brightness/100), k)
+    v_calc = v*(_max_brightness/100)
+
+    # color = (h, s, v*(_max_brightness/100), k)
+    if (v_calc > _min_brightness):
+        # max values are 65535 for h, s and v. k is between 1500 and 7000 for color mini
+        color = (h, s, v*(_max_brightness/100), k)
+
+    else:
+        color = (0, 65535, 1, _monitor_color_temp) # a very dim red
 
     # set each light to the colour just generated
     for light in _lights:
@@ -201,6 +209,7 @@ def main():
     factor = 1 # 1: good PC performance, 0.75: average PC performance (may cause colour artifacting)
     fade_mode = fade_modes['game'] # default:'desktop'
     monitor_color_temp = monitor_color_temps['default']
+    min_brightness = 1
     max_brightness = 100 # default:100
     monitor_w = 1920
     monitor_h = 1080
@@ -211,7 +220,9 @@ def main():
 
     # get lifx interface and lights
     lifx = return_interface(num_lights)
-    lights = get_lights(lifx)
+    # lights = get_lights(lifx)
+    lights = [lifx.get_device_by_name("Proto Tile")]
+    # lights = [lifx.get_device_by_name("Office Ceiling")]
     list_lights(lights)
     managedLights = create_managed_lights(lights)
 
@@ -227,7 +238,7 @@ def main():
             # blink_light(ml.light)
 
         while True:
-            scan_set_loop(scan_method,sample_size,lights,monitor_num,factor,fade_mode,monitor_color_temp,max_brightness)
+            scan_set_loop(scan_method,sample_size,lights,monitor_num,factor,fade_mode,monitor_color_temp,min_brightness,max_brightness)
             sleep(1/colorScan_Hz) # TODO: this shouldn't be static, make it a preference
 
     finally:

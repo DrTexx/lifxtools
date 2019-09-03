@@ -1,4 +1,4 @@
-#!/home/denver/Applications/lifxtools/bin/python3
+#!/home/denver/Applications/lifxtools/bin/python3 -E
 
 from lifxtools import return_interface, default_color
 

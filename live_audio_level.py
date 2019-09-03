@@ -1,3 +1,5 @@
+#!/home/denver/Applications/lifxtools/bin/python3 -E
+
 # based on code by the brilliant Scott Harden
 # original post code is adapted from:
 # https://www.swharden.com/wp/2016-07-19-realtime-audio-visualization-in-python/
@@ -39,9 +41,9 @@ from hsv2ansi import hsv2ansi
 fade = 0 # in milliseconds
 slow_hue = True
 min_brightness = 1 # default value - 1 (if this is 0 responsiveness might be impacted negatively)
-max_brightness = 65535*0.5   # default value - 65535
+max_brightness = 65535*0.25   # default value - 65535
 vol_multiplier = 6 # 6 - Loud HQ music, 8 - Normal HQ Music or Spotify normalized to 'loud' enviroment, 10 - spotify normalize to 'normal'
-update_Hz = 120 # 120 is default, low-spec PC's need lower Hz, light can't handle Hz too high and crash intermitently
+update_Hz = 60 # 120 is default, low-spec PC's need lower Hz, light can't handle Hz too high and crash intermitently
                 # note: tilechains take a lot more processing power to do realtime music-vis
 
 # ---- functions ----
@@ -281,8 +283,8 @@ try:
         # v = 65535*(1-normLR) # inverse brightness - higher levels = lower brightness
         # k = 6500
 
-        for light in lights:
-            light.set_color((h,s,v,k),fade,True)
+        # for light in lights:
+        #     light.set_color((h,s,v,k),fade,True)
 
         # paint by pixel index - do for each music sample taken
         # pixel_color = (0, 0, 0, 6500)
@@ -310,11 +312,14 @@ try:
         #     y = 0
 
         if (tilechains_present == True):
-            pixel_color = (65535*hue, 65535*1, 65535*normLR, 6500)
+            pixel_color = (65535*hue, 65535*1, max_brightness*normLR, 6500)
             pixel_empty = (0, 0, 0, 6500)
             # m_tc.canvas = np.roll(m_tc.canvas, 1, axis=1) # shift canvas on axis
             # m_tc.canvas = m_tc._gen_empty_frame()
             m_tc.paint_line(pixel_color,'y',0) # paint line on side of canvas
+            m_tc.paint_line(pixel_color,'x',0) # paint line on side of canvas
+            m_tc.paint_line(pixel_color,'y',7) # paint line on side of canvas
+            m_tc.paint_line(pixel_color,'x',7) # paint line on side of canvas
             # m_tc.paint_line(pixel_color,'y',7) # paint line on side of canvas
             # # m_tc.paint_line(pixel_empty,'y',1)
             # # m_tc.paint_line(pixel_empty,'x',2)

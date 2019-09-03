@@ -2,7 +2,6 @@
 build
 dist
 *.egg-info
-monitor-1.png
 .flatpak-builder
 build-dir/
 test_music_tracks/

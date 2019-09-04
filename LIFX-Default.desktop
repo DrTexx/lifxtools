@@ -1,9 +1,9 @@
 [Desktop Entry]
 Type=Application
-Name=LIFX - Bedtime
-GenericName=LIFX - Bedtime
-Comment=Set all LIFX bulbs to bedtime color preset
-Exec=/home/denver/github/lifxtools/set_all_bedtime.py
+Name=LIFX - Default
+GenericName=LIFX - Default
+Comment=Set all LIFX bulbs to default color preset
+Exec=/home/denver/github/lifxtools/set_all_default.py
 #Icon=arduino-arduinoide
 Terminal=true
 #Categories=Electronics;

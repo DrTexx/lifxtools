@@ -1,4 +1,4 @@
-#!/home/denver/Applications/lifxtools/bin/python3 -E
+#!/home/denver/venvs/lifxtools/bin/python3 -E
 
 # based on code by the brilliant Scott Harden
 # original post code is adapted from:

@@ -1,4 +1,4 @@
-#!/home/denver/Applications/lifxtools/bin/python3 -E
+#!/home/denver/venvs/lifxtools/bin/python3 -E
 
 from lifxtools import return_interface, bedtime_color
 

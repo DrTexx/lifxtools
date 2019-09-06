@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+#!/home/denver/venvs/lifxtools/bin/python3 -E
+
 '''
 change all lifx globes to the on-screen color average of a monitor/s of your choice
 '''
@@ -209,7 +210,7 @@ def main():
     factor = 1 # 1: good PC performance, 0.75: average PC performance (may cause colour artifacting)
     fade_mode = fade_modes['game'] # default:'desktop'
     monitor_color_temp = monitor_color_temps['default']
-    min_brightness = 1
+    min_brightness = 1 # default: 1
     max_brightness = 100 # default:100
     monitor_w = 1920
     monitor_h = 1080
@@ -220,11 +221,13 @@ def main():
 
     # get lifx interface and lights
     lifx = return_interface(num_lights)
-    # lights = get_lights(lifx)
-    lights = [lifx.get_device_by_name("Proto Tile")]
+    lights = lifx.get_lights()
     # lights = [lifx.get_device_by_name("Office Ceiling")]
-    list_lights(lights)
-    managedLights = create_managed_lights(lights)
+    if (len(lights) > 1):
+        list_lights(lights)
+        managedLights = create_managed_lights(lights)
+    else:
+        raise Exception("No lights found!")
 
     # the block of data to analyze. PIL resizing to 1x1 seems to do strange things; a bigger box works better (and still plenty fast)
     sample_size = (int(monitor_w/monitor_sample_scale), int(monitor_h/monitor_sample_scale))

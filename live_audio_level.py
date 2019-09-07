@@ -127,6 +127,7 @@ class BarSegment:
 
 lifx = lifxtools.return_interface(None)
 lights = lifx.get_devices()
+lifxtools.list_lights(lights)
 # lights = lifx.get_devices_by_group("Office").get_device_list()
 # lights = [lifx.get_device_by_name("Proto Tile")]
 tilechains = lifx.get_tilechain_lights()
@@ -283,8 +284,8 @@ try:
         # v = 65535*(1-normLR) # inverse brightness - higher levels = lower brightness
         # k = 6500
 
-        # for light in lights:
-        #     light.set_color((h,s,v,k),fade,True)
+        for light in lights:
+            light.set_color((h,s,v,k),fade,True)
 
         # paint by pixel index - do for each music sample taken
         # pixel_color = (0, 0, 0, 6500)

@@ -38,13 +38,14 @@ from hsv2ansi import hsv2ansi
 
 # ---- settings ----
 
-fade = 0 # in milliseconds
+fade = 15 # in milliseconds
 slow_hue = True
 min_brightness = 1 # default value - 1 (if this is 0 responsiveness might be impacted negatively)
-max_brightness = 65535*0.25   # default value - 65535
+max_brightness = 65535*0.75   # default value - 65535
 vol_multiplier = 6 # 6 - Loud HQ music, 8 - Normal HQ Music or Spotify normalized to 'loud' enviroment, 10 - spotify normalize to 'normal'
-update_Hz = 60 # 120 is default, low-spec PC's need lower Hz, light can't handle Hz too high and crash intermitently
+update_Hz = 120 # 120 is default, low-spec PC's need lower Hz, light can't handle Hz too high and crash intermitently
                 # note: tilechains take a lot more processing power to do realtime music-vis
+color_temp = 6500 # default: 6500
 
 # ---- functions ----
 
@@ -185,6 +186,8 @@ try:
     if (tilechains_present == True):
         y_max = len(m_tc.canvas) - 1
         x_max = len(m_tc.canvas[0]) - 1
+    last_normLR = 0
+    loop_delay = 1/update_Hz
 
     while stream.is_active():
         # data = np.frombuffer(stream.read(1024),dtype=np.int16,exception_on_overflow=False)
@@ -220,7 +223,13 @@ try:
 
         volume_cycle_impact = 1 # number is the amount of time to skip into the future of the hue cycle when the volume is loud
 
-        hue_y = abs(math.sin(hue + hue*volume_cycle_impact*normLR))
+        if (normLR > last_normLR):
+            volume_cycle_add = (normLR - last_normLR)
+        else:
+            volume_cycle_add = 0
+
+        # hue_y = abs(math.sin(hue + hue*volume_cycle_impact*normLR))
+        hue_y = abs(math.sin(hue))
 
         hue_y_ansi = hsv2ansi(hue_y,0,0)
 
@@ -270,28 +279,28 @@ try:
         s = 65535*math.cos(1-normLR) # inverse saturation - higher levels = lower saturation
         v = min_brightness + ((max_brightness-min_brightness)*normLR) # regular brightness
         # v = 65535*0.5
-        k = 6500
+        k = color_temp
 
         # whiteout mode!
         # h = 65535*(1-hue_y)
         # s = 65535*math.cos(1-normLR) # inverse saturation - higher levels = lower saturation
         # v = 1 + ((65535-1)*normLR) # regular brightness
-        # k = 6500
+        # k = color_temp
 
         # blackout mode! (bass seems to feel more natural)
         # h = 65535*hue
         # s = 65535*math.sin(normLR) # regular saturation - higher levels = higher saturation
         # v = 65535*(1-normLR) # inverse brightness - higher levels = lower brightness
-        # k = 6500
+        # k = color_temp
 
         for light in lights:
             light.set_color((h,s,v,k),fade,True)
 
         # paint by pixel index - do for each music sample taken
-        # pixel_color = (0, 0, 0, 6500)
+        # pixel_color = (0, 0, 0, color_temp)
 
         # paint pixel at x,y
-        # pixel_color = (65535*hue, 65535*1, 65535*normLR, 6500)
+        # pixel_color = (65535*hue, 65535*1, 65535*normLR, color_temp)
         # m_tc.paint_pixel(pixel_color, x, y)
         # if (y < y_max): # if x is not maxed
         #     if (x < x_max):
@@ -303,8 +312,8 @@ try:
         #     y = 0
 
         # scan amplitude along x
-        # pixel_color = (65535*hue_y, 65535*normLR, (65535*0.1)+(65535*0.9)*normLR, 6500)
-        # pixel_white = (0, 0, (65535*0.1)+(65535*0.9)*normLR, 6500)
+        # pixel_color = (65535*hue_y, 65535*normLR, (65535*0.1)+(65535*0.9)*normLR, color_temp)
+        # pixel_white = (0, 0, (65535*0.1)+(65535*0.9)*normLR, color_temp)
         # m_tc.paint_line(pixel_color,'x',y-1)
         # m_tc.paint_line(pixel_white,'x',y)
         # if (y < y_max):
@@ -313,8 +322,8 @@ try:
         #     y = 0
 
         if (tilechains_present == True):
-            pixel_color = (65535*hue, 65535*1, max_brightness*normLR, 6500)
-            pixel_empty = (0, 0, 0, 6500)
+            pixel_color = (65535*hue, 65535*1, max_brightness*normLR, color_temp)
+            pixel_empty = (0, 0, 0, color_temp)
             # m_tc.canvas = np.roll(m_tc.canvas, 1, axis=1) # shift canvas on axis
             # m_tc.canvas = m_tc._gen_empty_frame()
             m_tc.paint_line(pixel_color,'y',0) # paint line on side of canvas
@@ -330,7 +339,9 @@ try:
 
             m_tc.update_tilechain()
 
-        sleep(1/update_Hz)
+        sleep(loop_delay)
+
+        hue += volume_cycle_add/200
 
         # increment or reset hue
         if (hue < 1):
@@ -339,6 +350,9 @@ try:
             else: raise TypeError("slow_hue must be a bool!")
         else:
             hue = 0
+
+        # set last_normLR
+        last_hue = hue
 
         # print("L:%00.02f R:%00.02f"%(peakL*100, peakR*100))
 finally:

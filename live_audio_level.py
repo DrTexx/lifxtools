@@ -28,7 +28,9 @@ import numpy as np
 import lifxtools
 from time import sleep
 from ManagedTilechain import ManagedTilechain
+from ManagedLifx import ManagedLifx
 import math
+import threading
 
 from colorama import init
 init()
@@ -63,7 +65,7 @@ def print_bar(_name,_val,_seg_active,_seg_inactive,_total_segments=100):
     if not (type(_seg_active) == BarSegment or type(_seg_inactive) == BarSegment):
         raise TypeError("active_segment and inactive_segment must be BarSegment objects")
     elif not (0 <= _val <= 1): # ensure _val is between 0 and 1
-        raise ValueError("val must be between 0 and 1")
+        raise ValueError("val must be between 0 and 1, value was",_val)
     else:
         segments_activated = int(_val*_total_segments)
 
@@ -98,7 +100,7 @@ def callback(in_data, frame_count, time_info, flag):
     data = np.frombuffer(in_data, dtype=np.float32)
 
     #do whatever with data, in my case I want to hear my data filtered in realtime
-    print("reading!")
+    # print("reading!")
     # data = signal.filtfilt(b,a,data,padlen=200).astype(np.float32).tostring()
 
     fulldata = np.append(fulldata,data) #saves filtered data in an array
@@ -127,16 +129,15 @@ class BarSegment:
 # ---- script ----
 
 lifx = lifxtools.return_interface(None)
-lights = lifx.get_devices()
-lifxtools.list_lights(lights)
+mlifx = ManagedLifx(lifx)
+mlifx.print_device_labels()
+
+lights = mlifx.devices
+
+# lifxtools.list_lights(lights)
 # lights = lifx.get_devices_by_group("Office").get_device_list()
 # lights = [lifx.get_device_by_name("Proto Tile")]
 tilechains = lifx.get_tilechain_lights()
-
-# remove tilechains from normal light list
-for light_n in range(len(lights)):
-    if (lights[light_n] in tilechains):
-        lights.remove(lights[light_n])
 
 # create and prepare (save state of) managed lights
 managedLights = lifxtools.create_managed_lights(lights)
@@ -146,6 +147,16 @@ lifxtools.prepare_managedLights(managedLights)
 tilechains_present = len(tilechains) > 0
 
 if (tilechains_present == True):
+
+    tilechains_labels = []
+    for tilechain in tilechains:
+        tilechains_labels.append(tilechain.get_label())
+
+    # remove tilechains from normal light list
+    for light_n in range(len(lights)):
+        if (lights[light_n].get_label() in tilechains_labels):
+            lights.remove(lights[light_n])
+
     tilechain = tilechains[0]
     m_tc = ManagedTilechain(tilechain)
 
@@ -172,54 +183,36 @@ stream = pa.open(
 stream.start_stream()
 
 try:
-    maxValue = 2**16
+    max_audio_value = 2**16
 
     active_segment = BarSegment("■") # todo: this is a bit wasteful, revise this later
     inactive_segment = BarSegment("□")
-
 
     hue = 0 # float: 0 .. 1
 
     i = 0
     y = 0
     x = 0
+
     if (tilechains_present == True):
         y_max = len(m_tc.canvas) - 1
         x_max = len(m_tc.canvas[0]) - 1
+
     last_normLR = 0
     loop_delay = 1/update_Hz
 
     while stream.is_active():
-        # data = np.frombuffer(stream.read(1024),dtype=np.int16,exception_on_overflow=False)
+
         data = g_data
-        # amplitude = np.frombuffer(audio.stream.read(1024),dtype=np.array)
 
         # dataL = data[0::2]
         # dataR = data[1::2]
-        # peakL = np.abs(np.max(dataL)-np.min(dataL))/maxValue
-        # peakR = np.abs(np.max(dataR)-np.min(dataR))/maxValue
-
-        # def redraw_figure():
-        #     plt.draw()
-        #     plt.pause(0.00001)
-        #
-        # print(data)
-        # import matplotlib.pyplot as plt
-        data_frames = len(data) # the number of frames in the captured audio data
-        time = np.arange(0,data_frames) # an array from 0 to the total number of frames captured for this loop
-        # figure, axis = plt.subplots(4, 1)
-        # print(type(time))
-        # print(type(data))
-        # axis[0].plot(time, data)
-        # # redraw_figure()
-        # i = i + 1
-        # if i > 2:
-        #     input()
-
+        # peakL = np.abs(np.max(dataL)-np.min(dataL))/max_audio_value
+        # peakR = np.abs(np.max(dataR)-np.min(dataR))/max_audio_value
 
         volume_norm = np.linalg.norm(data) # normalize audio level
         volume_norm_multiplied = volume_norm*vol_multiplier
-        normLR = clamp((volume_norm_multiplied / maxValue) / 100, 0, 1) # clamp audio level
+        normLR = clamp((volume_norm_multiplied / max_audio_value) / 100, 0, 1) # clamp audio level
 
         volume_cycle_impact = 1 # number is the amount of time to skip into the future of the hue cycle when the volume is loud
 
@@ -293,8 +286,18 @@ try:
         # v = 65535*(1-normLR) # inverse brightness - higher levels = lower brightness
         # k = color_temp
 
-        for light in lights:
-            light.set_color((h,s,v,k),fade,True)
+        exit_flag = False
+
+        def set_light_colors(lights,hsvk_tuple,fade,rapid):
+            for light in lights:
+                light.set_color(hsvk_tuple,fade,rapid)
+
+        def slc_loop():
+            while (exit_flag == False):
+                set_light_colors(lights,hsvk_tuple,fade,rapid)
+
+        x = threading.Thread(target=set_light_colors, args=(lights, (h,s,v,k), fade, True))
+        x.start()
 
         # paint by pixel index - do for each music sample taken
         # pixel_color = (0, 0, 0, color_temp)
@@ -344,14 +347,14 @@ try:
         hue += volume_cycle_add/200
 
         # increment or reset hue
-        if (hue < 1):
-            if (slow_hue == True): hue += 0.001
-            elif (slow_hue == False): hue += 0.01
-            else: raise TypeError("slow_hue must be a bool!")
-        else:
-            hue = 0
+        if (slow_hue == True): hue += 0.001
+        elif (slow_hue == False): hue += 0.01
+        else: raise TypeError("slow_hue must be a bool!")
 
-        # set last_normLR
+        if (hue < 1): pass
+        else: hue = hue - 1
+
+        # set last_hue
         last_hue = hue
 
         # print("L:%00.02f R:%00.02f"%(peakL*100, peakR*100))

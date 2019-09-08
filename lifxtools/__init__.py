@@ -51,6 +51,7 @@ def return_num_lights(devices):
     else:
         return(len(devices))
 
+@d_debug_messages
 def list_devices(devices):
     i = 0
     for device in devices:

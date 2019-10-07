@@ -351,8 +351,7 @@ try:
         elif (slow_hue == False): hue += 0.01
         else: raise TypeError("slow_hue must be a bool!")
 
-        if (hue < 1): pass
-        else: hue = hue - 1
+        hue = hue % 65535
 
         # set last_hue
         last_hue = hue

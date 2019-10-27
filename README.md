@@ -7,7 +7,7 @@
 
 # lifxtools
 
-***[DISCLAIMER]: IF YOU SUFFER PHOTOSENSITIVE EPLILEPSY, PLEASE DO NOT PLAY WITH THESE SCRIPTS. I CAN NOT GUARENTEE YOUR EPLILEPSY WILL NOT BE TRIGGERED BY A DEMO OR TECHNICAL BUG.***
+***[DISCLAIMER]: IF YOU SUFFER PHOTOSENSITIVE EPILEPSY, PLEASE DO NOT PLAY WITH THESE SCRIPTS. I CAN NOT GUARANTEE IT IS FREE OF TRIGGERS.***
 
 _[NOTE]: This readme is a work-in-progress. If you require any specific information, please submit a github issue. I will try my best to address any questions you have in this readme once I get the chance. Thanks! :)_
 

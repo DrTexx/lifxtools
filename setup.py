@@ -15,7 +15,7 @@ script_requirements = ["wheel",
                        "PyAudio==0.2.11"]
 readme_filename = 'README.md'
 readme_encoding = 'utf-8'
-script_version = '0.3.1'
+script_version = '0.3.2'
 script_description = 'Graphical interface for controlling lifx bulbs'
 github_username = 'DrTexx'
 script_author = 'Denver P'

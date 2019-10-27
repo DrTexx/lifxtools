@@ -6,13 +6,16 @@ https://github.com/pypa/sampleproject
 
 
 script_name = 'lifxtools'
-script_requirements = ["bitstring==3.1.6",
+script_requirements = ["wheel",
+                       "bitstring==3.1.6",
                        "lifxlan==1.2.5",
                        "netifaces==0.10.9",
-                       "pkg-resources==0.0.0"]
+                       "colorama==0.4.1",
+                       "numpy==1.17.0",
+                       "PyAudio==0.2.11"]
 readme_filename = 'README.md'
 readme_encoding = 'utf-8'
-script_version = '0.2.0'
+script_version = '0.3.1'
 script_description = 'Graphical interface for controlling lifx bulbs'
 github_username = 'DrTexx'
 script_author = 'Denver P'
@@ -22,7 +25,7 @@ meta_topic = 'Home Automation'
 meta_license = 'GNU General Public License v3 or later (GPLv3+)'
 meta_py_version = '3'
 meta_keywords=''
-
+long_description_content_type='text/markdown'
 
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
@@ -75,6 +78,8 @@ setup(
     # This field corresponds to the "Description" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#description-optional
     long_description=long_description,  # Optional
+
+    long_description_content_type=long_description_content_type,
 
     # This should be a valid link to your project's main homepage.
     #

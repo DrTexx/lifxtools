@@ -1,8 +1,29 @@
 # lifxtools
 
-`python3 -m lifxtools` is where the action is at
-
 _[NOTE]: This readme is a work-in-progress. If you require any specific information, please submit a github issue. I will try my best to address any questions you have in this readme once I get the chance. Thanks! :)_
+
+_[NOTE]: For the moment, live_audio_level.py is WAAAAY less responsive on Windows than on Linux, this is being worked on._
+
+_[NOTE]: The latest version of a dependency (PyAudio v0.2.11) doesn't support the most recent version of python (3.7.4) on Windows 10 as of this commit (2019/10/07 @ 07:75PM)_
+
+_[NOTE]: Mac requires a method to pipe your desktop audio into an audio input, soundflower can be used for this_
+
+## Starting scripts
+1. Ensure you've navigated to the root of the repo after cloning
+
+### GUI (WIP)
+#### Linux
+1. `python3 -m lifxtools`
+
+### Real-time Audio Visualiser
+#### Linux
+1. `chmod +x live_audio_level.py` (ensure live_audio_level.py is executable)
+1. `python3 -m venv venv` (set up a venv)
+1. `source venv/bin/activate` (activate the venv)
+1. `pip install -r requirements.txt` (install the necessary requirements)
+1. `./live_audio_level.py` (launch the script)
+
+
 
 ## Notable usages
 ### average_screen_color.py

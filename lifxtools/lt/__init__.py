@@ -1,94 +1,144 @@
-'''
+"""
 lt module from lifxtools package
-'''
+"""
 
 print("lifxtools/lt/__init__.py")
 
-# imports
-from lifxtools import *
+# UI imports
+import tkinter as tk  # for UI
+from tkinter import ttk  # for not ugly UI
 
-# settings
-num_lights = None
-debug = True
+# Backend imports
+import lifxtools  # for controlling lights
 
-def start():
-    lifx = return_interface(num_lights)
-    devices = lifx.get_lights()
-    list_devices(devices)
-    # blink_devices(devices)
 
-    root = Tk()
+class Navbar(tk.Frame):
+    def __init__(self, parent, *args, **kwargs):
+        tk.Frame.__init__(self, parent, *args, **kwargs)
+        self.parent = parent
+        print(self._name,"PARENT =",self.parent)
 
-    class Window(Frame):
 
-        def __init__(self,master=None):
-            Frame.__init__(self,master)
-            self.master = master
-            self._init_window()
+        self.notebook = ttk.Notebook(self.parent)
 
-        def _init_window(self):
-            m = self.master
-            m.title = "Lifx Tk Controller"
+        self.page_lightcontrol = tk.Frame(self.notebook)
+        self.page_scenemanager = tk.Frame(self.notebook)
 
-            test_frame = Frame(m)
-            test_frame.pack()
+        self.devices_found = tk.Listbox(self.page_lightcontrol, selectmode=tk.EXTENDED)
+        self.devices_found.pack()
 
-            live_data_frame = Frame(test_frame)
-            live_data_frame.pack()
+        print("devices",self.parent.mlifx.devices) # print found devices to console
 
-            live_data_checkbox = Checkbutton(live_data_frame, text="Enable live data", var=live_data)
-            live_data_checkbox.var = live_data
-            live_data_checkbox.pack()
+        for index, mdevice in enumerate(self.parent.mlifx.managed_devices, 0): # add each found device to the GUI list
+            self.devices_found.insert(index, mdevice.label)
 
-            test_text = Label(test_frame,text="Lights discovered")
-            test_text.pack()
+        print_selected_device = tk.Button(self.page_lightcontrol, text="print selected devices index to console", command=self._print_selected_devices)
+        print_selected_device.pack()
 
-            self.light_settings = {}
-            for device in devices:
-                dev_label = str(device.get_label())
-                self.light_settings[dev_label] = {'device': device, 'frame': Frame(test_frame)} # add frames and all relevant things here
-                # configure frames and relevant items here
-                self.light_settings[dev_label]['frame'].config(padding=5,relief=SUNKEN)
-                self.light_settings[dev_label]['frame'].pack(fill=X)
+        toggle_device_power = tk.Button(self.page_lightcontrol, text="toggle device power", command=self._toggle_device_power)
+        toggle_device_power.pack()
 
-                _light_device = self.light_settings[dev_label]['device']
-                _light_frame = self.light_settings[dev_label]['frame']
+        set_to_default = tk.Button(self.page_lightcontrol, text="set to default", command=self._set_to_default)
+        set_to_default.pack()
 
-                light_label = Label(_light_frame, text=str(_light_device.get_label()))
-                light_label.pack(side=LEFT)
+        set_to_bedtime = tk.Button(self.page_lightcontrol, text="set to bedtime", command=self._set_to_bedtime)
+        set_to_bedtime.pack()
 
-                light_toggle = Button(_light_frame, text="toggle power", command=lambda: toggle_light(_light_device))
-                light_toggle.pack(side=LEFT)
+        save_state = tk.Button(self.page_lightcontrol, text="save state", command=self._save_state)
+        save_state.pack()
 
-                # light_brightness = Scale(_light_frame, from_=0, to=65535, orient=HORIZONTAL) # this needs to be accessible outside of for loop, right now it is not
-                # light_brightness.pack(side=LEFT)
+        load_state = tk.Button(self.page_lightcontrol, text="load state", command=self._load_state)
+        load_state.pack()
 
-                light_profile_default = Button(_light_frame, text="default color", command=lambda: set_light_color(_light_device,default_color))
-                print(_light_device)
-                light_profile_default.pack(side=LEFT)
 
-                light_profile_bedtime = Button(_light_frame, text="bedtime color", command=lambda: set_light_color(_light_device,bedtime_color))
-                light_profile_bedtime.pack(side=LEFT)
 
-                light_profile_white = Button(_light_frame, text="white color", command=lambda: set_light_color(_light_device, WHITE))
-                light_profile_white.pack(side=LEFT)
+        self.notebook.add(self.page_lightcontrol, text="Light Control")
+        self.notebook.add(self.page_scenemanager, text="Scene Manager")
 
-                light_profile_red = Button(_light_frame, text="red color", command=lambda: set_light_color(_light_device, RED))
-                light_profile_red.pack(side=LEFT)
+        self.notebook.pack(expand=1, fill="both")
 
-            if (debug == True): print(self.light_settings)
+    def _print_selected_devices(self):
+        print(self.devices_found.curselection()) # return a tuple of indexes for selected items
 
-#        def _update_brightness(self): self.light0_brightness.set(get_light_brightness(devices[0]))
+    def _get_selected_mdevices(self):
+        device_indexes = self.devices_found.curselection()
+        devices_to_return = []
+        for device_i in device_indexes:
+            devices_to_return.append(self.parent.mlifx.managed_devices[device_i])
+        return devices_to_return # return a tuple of indexes for selected items
 
-        def _update_loop(self,ms_per_loop=1000):
-            if (live_data == True):
-                pass
-#                self._update_brightness()
-            self.after(ms_per_loop,self._update_loop) # repeat _update_loop()
+    def _toggle_device_power(self):
+        mdevices = self._get_selected_mdevices()
+        print("toggling power of mdevices:",mdevices)
+        for mdevice in mdevices:
+            mdevice.device.set_power(not mdevice.device.get_power())
 
-        def _exit_app(self,event):
-            exit()
+    def _set_to_default(self):
+        mdevices = self._get_selected_mdevices()
+        print("setting mdevices to default:",mdevices)
+        for mdevice in mdevices:
+            mdevice.device.set_color(lifxtools.default_color)
 
-    app = Window(root)
-    app._update_loop() # must be before main loop
+    def _set_to_bedtime(self):
+        mdevices = self._get_selected_mdevices()
+        print("setting mdevices to bedtime:",mdevices)
+        for mdevice in mdevices:
+            mdevice.device.set_color(lifxtools.bedtime_color)
+
+    def _save_state(self):
+        mdevices = self._get_selected_mdevices()
+        print("saving state of mdevices:",mdevices)
+        for mdevice in mdevices:
+            mdevice.ssave()
+
+    def _load_state(self):
+        mdevices = self._get_selected_mdevices()
+        print("loading state of mdevices:",mdevices)
+        for mdevice in mdevices:
+            mdevice.sload()
+
+class MainApplication(tk.Frame):
+    def __init__(self, parent, *args, **kwargs):
+        tk.Frame.__init__(self, parent, *args, **kwargs)
+        self.parent = parent
+        print(self._name,"PARENT =",self.parent)
+
+        # <create the rest of your GUI here>
+        self._init_mlifx()
+        self._init_GUI()
+        print("finished preparing program!")
+
+    def _init_mlifx(self):
+
+        print("_init_mlifx...")
+        self.mlifx = lifxtools.ManagedLifx(lifxtools.return_interface(None))
+        print(self.mlifx.devices)
+
+    def _init_GUI(self):
+
+        print("_init_GUI...")
+        self.navbar = Navbar(self)
+        self.navbar.pack(side="left", fill="y")
+
+    def _update_loop(self, ms_per_loop=1000):
+        # if live_data == True:
+        #     pass
+        #                self._update_brightness()
+        self.after(ms_per_loop, self._update_loop)  # repeat _update_loop()
+
+    def _exit_app(self, event):
+        exit()
+
+
+if __name__ == "lifxtools.lt":
+
+    root = tk.Tk()
+    mainApp = MainApplication(root)
+    mainApp.pack(side="top", fill="both", expand=True)
+    mainApp._update_loop()  # must be before main loop
     root.mainloop()
+
+    # lifx = return_interface(num_lights)
+    # devices = lifx.get_lights()
+    # list_devices(devices)
+    # blink_devices(devices)

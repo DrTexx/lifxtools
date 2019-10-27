@@ -7,6 +7,8 @@
 
 # lifxtools
 
+***[DISCLAIMER]: IF YOU SUFFER PHOTOSENSITIVE EPLILEPSY, PLEASE DO NOT PLAY WITH THESE SCRIPTS. I CAN NOT GUARENTEE YOUR EPLILEPSY WILL NOT BE TRIGGERED BY A DEMO OR TECHNICAL BUG.***
+
 _[NOTE]: This readme is a work-in-progress. If you require any specific information, please submit a github issue. I will try my best to address any questions you have in this readme once I get the chance. Thanks! :)_
 
 _[NOTE]: For the moment, live_audio_level.py is WAAAAY less responsive on Windows than on Linux, this is being worked on._

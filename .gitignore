@@ -6,3 +6,4 @@ dist
 build-dir/
 test_music_tracks/
 venv/
+reference_snippets/

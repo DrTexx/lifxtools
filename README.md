@@ -1,3 +1,10 @@
+[![PyPI Version](https://img.shields.io/pypi/v/lifxtools.svg)](https://pypi.python.org/pypi/lifxtools/)
+[![GitHub release](https://img.shields.io/github/release-pre/drtexxofficial/lifxtools.svg)](https://GitHub.com/DrTexx/lifxtools/releases/)
+[![GitHub license](https://img.shields.io/github/license/DrTexx/lifxtools.svg?branch=master)](https://github.com/DrTexx/lifxtools/blob/master/LICENSE)
+[![Github all releases](https://img.shields.io/github/downloads/DrTexx/lifxtools/total.svg)](https://GitHub.com/DrTexx/lifxtools/releases/)
+[![Platform: Windows,Mac,Linux](https://img.shields.io/badge/Platform-Windows%20%7C%20Mac%20%7C%20Linux-blue.svg)](#)
+
+
 # lifxtools
 
 _[NOTE]: This readme is a work-in-progress. If you require any specific information, please submit a github issue. I will try my best to address any questions you have in this readme once I get the chance. Thanks! :)_

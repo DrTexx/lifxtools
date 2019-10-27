@@ -7,7 +7,7 @@ class DeviceState:
         self.power = power
         self.color = color
 
-class ManagedDevice:
+class ManagedDevice(object):
     def __init__(self,device):
         self.device = device
         self.label = device.get_label()

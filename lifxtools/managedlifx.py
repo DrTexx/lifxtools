@@ -111,6 +111,11 @@ class ManagedLifx:
         self.light_count = len(self.lights)
         self.tilechain_count = len(self.tilechains)
 
+    def add_device(self,new_device):
+
+        self.devices.append(new_device)
+        self.managed_devices.append(lifxtools.ManagedDevice(new_device))
+
     def prepare(self):
 
         for mlight in self.managed_lights:

@@ -11,8 +11,6 @@ from tkinter import ttk  # for not ugly UI
 # Backend imports
 import lifxtools  # for controlling lights
 
-vdevice = lifxtools.VirtualDevice(lifxtools.VLIGHT)
-
 class Navbar(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
@@ -113,6 +111,7 @@ class MainApplication(tk.Frame):
 
         print("_init_mlifx...")
         self.mlifx = lifxtools.ManagedLifx(lifxtools.return_interface(None))
+        self.mlifx.add_device(lifxtools.VirtualDevice())
         print(self.mlifx.devices)
 
     def _init_GUI(self):

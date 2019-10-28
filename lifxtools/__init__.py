@@ -5,6 +5,7 @@ lifxtools package
 print("lifxtools/__init__.py")
 
 from .manageddevice import *
+from .virtualdevice import *
 from .managedlifx import *
 from .managedlight import *
 from .managedtilechain import *

@@ -96,14 +96,30 @@ class Navbar(tk.Frame):
 
 
 class DeviceFrameRep(tk.Frame):
-    def __init__(self,device_obj,parent,*args,**kwargs):
+    def __init__(self,mdevice_obj,parent,*args,**kwargs):
         tk.Frame.__init__(self,parent,*args,**kwargs)
         self.parent = parent
 
-        self.device = device_obj
+        self.mdevice = mdevice_obj
 
         self.placeholder = tk.Label(self,text="DEVICE PREVIEW PLACEHOLDER")
         self.placeholder.pack()
+
+        self.canvas = tk.Canvas(self, width=100, height=100)
+        self.canvas.pack()
+        self.canvas_rectangle = self.canvas.create_rectangle(0, 0, 100, 100, fill="#40E0D0")
+
+    def refresh(self):
+        print(type(self.mdevice))
+        print(type(self.mdevice.device))
+        color = self.mdevice.device.get_color()
+        if (type(color) == tuple):
+            h, s, v, k = color
+            r, g, b = lifxtools.hsv2rgb(h, s, v)
+            hex = "#%02x%02x%02x" % (r, g, b) # todo: fix this please god damn it Denver you fool
+            self.canvas.itemconfig(self.canvas_rectangle,fill=hex)
+        else:
+            print("self.device.color must be a tuple!")
 
 
 class MainApplication(tk.Frame):
@@ -133,6 +149,7 @@ class MainApplication(tk.Frame):
         self.device_test.pack()
 
     def _update_loop(self, ms_per_loop=1000):
+        self.device_test.refresh()
         # if live_data == True:
         #     pass
         #                self._update_brightness()

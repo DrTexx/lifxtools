@@ -32,7 +32,7 @@ from .color_presets import *
 # imports
 from time import sleep, process_time  # used for delays and benchmarking
 from lifxlan import LifxLAN, RED, WHITE  # used for controlling lights
-from colorsys import rgb_to_hsv
+from colorsys import rgb_to_hsv, hsv_to_rgb
 
 # settings
 num_lights = None  # makes discovery much faster when specified instead of none
@@ -196,12 +196,14 @@ def rgbk2hsvk(r, g, b, k):
     k = k
     return (h, s, v, k)
 
+def hsv2rgb(h, s, v):
+    r, g, b = hsv_to_rgb(h/65535, s/65535, v/65535)
+    return (r, g, b)
 
 def prepare_ManagedLights(_ManagedLights):
     for ml in _ManagedLights:
         ml.ssave()
         ml.light.set_power(True)
-
 
 def restore_ManagedLights(_ManagedLights):
     for ml in _ManagedLights:

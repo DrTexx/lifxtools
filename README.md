@@ -15,6 +15,15 @@ _[NOTE]: The latest version of a dependency (PyAudio v0.2.11) doesn't support th
 
 _[NOTE]: Mac requires a method to pipe your desktop audio into an audio input, soundflower can be used for this_
 
+## Basic instructions
+### Install from PyPi
+
+| Step | linux | windows |
+| - - - | - - - | - - - |
+| #1 | `python3 -m venv lifxtools-venv` | - |
+| #2 | `source lifxtools-venv/bin/activate` | - |
+| #3 | `pip install lifxtools` | - |
+
 ## Starting scripts
 1. Ensure you've navigated to the root of the repo after cloning
 

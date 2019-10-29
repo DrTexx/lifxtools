@@ -61,9 +61,7 @@ class Navbar(tk.Frame):
 
     def _get_selected_mdevices(self):
         device_indexes = self.devices_found.curselection()
-        devices_to_return = []
-        for device_i in device_indexes:
-            devices_to_return.append(self.parent.mlifx.managed_devices[device_i])
+        devices_to_return = [self.parent.mlifx.managed_devices[device_i] for device_i in device_indexes]
         return devices_to_return # return a tuple of indexes for selected items
 
     def _toggle_device_power(self):
@@ -90,7 +88,7 @@ class Navbar(tk.Frame):
         for mdevice in mdevices:
             mdevice.ssave()
 
-    def _load_state(self):
+    def _load_state(self): # todo: implement the fact you can't load a state that was never saved!
         mdevices = self._get_selected_mdevices()
         print("loading state of mdevices:",mdevices)
         for mdevice in mdevices:

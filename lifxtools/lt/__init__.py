@@ -96,6 +96,18 @@ class Navbar(tk.Frame):
         for mdevice in mdevices:
             mdevice.sload()
 
+
+class DeviceFrameRep(tk.Frame):
+    def __init__(self,device_obj,parent,*args,**kwargs):
+        tk.Frame.__init__(self,parent,*args,**kwargs)
+        self.parent = parent
+
+        self.device = device_obj
+
+        self.placeholder = tk.Label(self,text="DEVICE PREVIEW PLACEHOLDER")
+        self.placeholder.pack()
+
+
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
@@ -119,6 +131,8 @@ class MainApplication(tk.Frame):
         print("_init_GUI...")
         self.navbar = Navbar(self)
         self.navbar.pack(side="left", fill="y")
+        self.device_test = DeviceFrameRep(self.mlifx.managed_devices[0],self) # create a frame for the first device
+        self.device_test.pack()
 
     def _update_loop(self, ms_per_loop=1000):
         # if live_data == True:

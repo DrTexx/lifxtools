@@ -1,4 +1,4 @@
-class VirtualDevice():
+class VirtualDevice:
     def __init__(self, label="Virtual Device", power=True, color=(0,0,65535,6500), is_light=True, supports_color=True):
         self._label = label
         self._power = power

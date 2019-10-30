@@ -7,7 +7,8 @@
 
 # lifxtools
 
-_[NOTE]: This readme is a work-in-progress. If you require any specific information, please submit a github issue. I will try my best to address any questions you have in this readme once I get the chance. Thanks! :)_
+## Important notes
+_[NOTE]: This readme is a work-in-progress. I am currently working on a GUI and improving separation of features. If you require any specific information, please submit a github issue. I will try my best to address any questions you have in this readme once I get the chance. Thanks! :)_
 
 _[NOTE]: For the moment, live_audio_level.py is WAAAAY less responsive on Windows than on Linux, this is being worked on._
 

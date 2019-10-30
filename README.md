@@ -16,8 +16,8 @@ _[NOTE]: The latest version of a dependency (PyAudio v0.2.11) doesn't support th
 
 _[NOTE]: Mac requires a method to pipe your desktop audio into an audio input, soundflower can be used for this_
 
-## Basic instructions
-### Install from PyPi
+## Using Lifxtools
+### Installing from PyPi
 
 | Step | *NIX |
 | --- | --- |
@@ -27,25 +27,14 @@ _[NOTE]: Mac requires a method to pipe your desktop audio into an audio input, s
 | #4 | install any external requirements for your platform (e.g. portaudio if it isn't pre-installed on your OS) |
 | #5 | `python3 -m lifxtools` (run lifxtools module with GUI) |
 
-## Starting scripts
-1. Ensure you've navigated to the root of the repo after cloning
-
-### GUI (WIP)
-#### Linux
-1. `python3 -m lifxtools`
-
 ### Real-time Audio Visualiser
-#### Linux
-1. `chmod +x live_audio_level.py` (ensure live_audio_level.py is executable)
-1. `python3 -m venv venv` (set up a venv)
-1. `source venv/bin/activate` (activate the venv)
-1. `pip install -r requirements.txt` (install the necessary requirements)
-1. `./live_audio_level.py` (launch the script)
+[todo]
 
+## Media for testing/demos
+### Real-time Audio Visualiser
+[todo]
 
-
-## Notable usages
-### Lightshow module
+### Average screen colour module
 (Ultra-slow fade mode)
 Stanley Kubrick's A Clockwork Orange is well enhanced by the effect of average_screen_color.py; first few minutes of the film are of particularly strong effect.
 

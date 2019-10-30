@@ -67,3 +67,6 @@ This has the intention of saving network bandwidth (and potenially a small amoun
 
 ### Add firewall issue detection
 Add tests for if a firewall is in place and whether it may cause issues for the scripts, if it's detected that it will, return a verbose error to the user to help them rectify the issue.
+
+### Change Volux to volux core and integrate the two projects together
+All core, universal classes and functions would stay in Volux Core, and then features such as the volume control edge would be seperated into a seperate module of sorts, kind of like a plugin or extension to the core. The same goes for the features available in lifxtools such as the live audio visualiser; it would become a module/plugin/extension.

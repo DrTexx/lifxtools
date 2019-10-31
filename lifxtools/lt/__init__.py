@@ -11,6 +11,16 @@ from tkinter import ttk  # for not ugly UI
 # Backend imports
 import lifxtools  # for controlling lights
 
+class LightShowTab(tk.Frame):
+    def __init__(self, parent, *args, **kwargs):
+        tk.Frame.__init__(self, parent, *args, **kwargs)
+        self.parent = parent
+        print(self._name,"PARENT =",self.parent)
+
+        self.placeholder = tk.Label(self, text="PLACEHOLDER")
+        self.placeholder.pack()
+
+
 class Navbar(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
@@ -22,6 +32,7 @@ class Navbar(tk.Frame):
 
         self.page_lightcontrol = tk.Frame(self.notebook)
         self.page_scenemanager = tk.Frame(self.notebook)
+        self.page_lightshow = LightShowTab(self.notebook)
 
         self.devices_found = tk.Listbox(self.page_lightcontrol, selectmode=tk.EXTENDED)
         self.devices_found.pack()
@@ -53,6 +64,7 @@ class Navbar(tk.Frame):
 
         self.notebook.add(self.page_lightcontrol, text="Light Control")
         self.notebook.add(self.page_scenemanager, text="Scene Manager")
+        self.notebook.add(self.page_lightshow, text="Light Show")
 
         self.notebook.pack(expand=1, fill="both")
 
@@ -149,10 +161,10 @@ class MainApplication(tk.Frame):
         self.device_test.pack()
 
     def _update_loop(self, ms_per_loop=1000):
-        self.device_test.refresh()
+        # self.device_test.refresh()
         # if live_data == True:
         #     pass
-        #                self._update_brightness()
+        # self._update_brightness()
         self.after(ms_per_loop, self._update_loop)  # repeat _update_loop()
 
     def _exit_app(self, event):

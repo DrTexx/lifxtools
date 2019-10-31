@@ -6,3 +6,4 @@ dist
 build-dir/
 test_music_tracks/
 venv/
+live_audio_level.py

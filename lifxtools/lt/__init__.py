@@ -11,27 +11,36 @@ from tkinter import ttk  # for not ugly UI
 # Backend imports
 import lifxtools  # for controlling lights
 
-class LightShowTab(tk.Frame):
+class LightShowTab(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
-        tk.Frame.__init__(self, parent, *args, **kwargs)
+        ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
         print(self._name,"PARENT =",self.parent)
 
-        self.placeholder = tk.Label(self, text="PLACEHOLDER")
+        self.placeholder = ttk.Label(self, text="PLACEHOLDER")
         self.placeholder.pack()
 
+        self.fade_slider = ttk.Scale(self, from_=0, to=1000)
+        self.fade_slider.pack()
 
-class Navbar(tk.Frame):
+        self.minbrightness_slider = ttk.Scale(self, from_=1, to=100)
+        self.minbrightness_slider.pack()
+
+        # w = Scale(master, from_=0, to=200, orient=tk.HORIZONTAL)
+        # w.pack()
+
+
+class Navbar(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
-        tk.Frame.__init__(self, parent, *args, **kwargs)
+        ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
         print(self._name,"PARENT =",self.parent)
 
 
         self.notebook = ttk.Notebook(self.parent)
 
-        self.page_lightcontrol = tk.Frame(self.notebook)
-        self.page_scenemanager = tk.Frame(self.notebook)
+        self.page_lightcontrol = ttk.Frame(self.notebook)
+        self.page_scenemanager = ttk.Frame(self.notebook)
         self.page_lightshow = LightShowTab(self.notebook)
 
         self.devices_found = tk.Listbox(self.page_lightcontrol, selectmode=tk.EXTENDED)
@@ -42,22 +51,22 @@ class Navbar(tk.Frame):
         for index, mdevice in enumerate(self.parent.mlifx.managed_devices, 0): # add each found device to the GUI list
             self.devices_found.insert(index, mdevice.label)
 
-        print_selected_device = tk.Button(self.page_lightcontrol, text="print selected devices index to console", command=self._print_selected_devices)
+        print_selected_device = ttk.Button(self.page_lightcontrol, text="print selected devices index to console", command=self._print_selected_devices)
         print_selected_device.pack()
 
-        toggle_device_power = tk.Button(self.page_lightcontrol, text="toggle device power", command=self._toggle_device_power)
+        toggle_device_power = ttk.Button(self.page_lightcontrol, text="toggle device power", command=self._toggle_device_power)
         toggle_device_power.pack()
 
-        set_to_default = tk.Button(self.page_lightcontrol, text="set to default", command=self._set_to_default)
+        set_to_default = ttk.Button(self.page_lightcontrol, text="set to default", command=self._set_to_default)
         set_to_default.pack()
 
-        set_to_bedtime = tk.Button(self.page_lightcontrol, text="set to bedtime", command=self._set_to_bedtime)
+        set_to_bedtime = ttk.Button(self.page_lightcontrol, text="set to bedtime", command=self._set_to_bedtime)
         set_to_bedtime.pack()
 
-        save_state = tk.Button(self.page_lightcontrol, text="save state", command=self._save_state)
+        save_state = ttk.Button(self.page_lightcontrol, text="save state", command=self._save_state)
         save_state.pack()
 
-        load_state = tk.Button(self.page_lightcontrol, text="load state", command=self._load_state)
+        load_state = ttk.Button(self.page_lightcontrol, text="load state", command=self._load_state)
         load_state.pack()
 
 
@@ -107,14 +116,14 @@ class Navbar(tk.Frame):
             mdevice.sload()
 
 
-class DeviceFrameRep(tk.Frame):
+class DeviceFrameRep(ttk.Frame):
     def __init__(self,mdevice_obj,parent,*args,**kwargs):
-        tk.Frame.__init__(self,parent,*args,**kwargs)
+        ttk.Frame.__init__(self,parent,*args,**kwargs)
         self.parent = parent
 
         self.mdevice = mdevice_obj
 
-        self.placeholder = tk.Label(self,text="DEVICE PREVIEW PLACEHOLDER")
+        self.placeholder = ttk.Label(self,text="DEVICE PREVIEW PLACEHOLDER")
         self.placeholder.pack()
 
         self.canvas = tk.Canvas(self, width=100, height=100)
@@ -134,9 +143,9 @@ class DeviceFrameRep(tk.Frame):
             print("self.device.color must be a tuple!")
 
 
-class MainApplication(tk.Frame):
+class MainApplication(ttk.Frame):
     def __init__(self, parent, *args, **kwargs):
-        tk.Frame.__init__(self, parent, *args, **kwargs)
+        ttk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
         print(self._name,"PARENT =",self.parent)
 

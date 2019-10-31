@@ -63,6 +63,9 @@ class Navbar(ttk.Frame):
         set_to_bedtime = ttk.Button(self.page_lightcontrol, text="set to bedtime", command=self._set_to_bedtime)
         set_to_bedtime.pack()
 
+        set_to_theatre = ttk.Button(self.page_lightcontrol, text="set to theatre", command=self._set_to_theatre)
+        set_to_theatre.pack()
+
         save_state = ttk.Button(self.page_lightcontrol, text="save state", command=self._save_state)
         save_state.pack()
 
@@ -102,6 +105,12 @@ class Navbar(ttk.Frame):
         print("setting mdevices to bedtime:",mdevices)
         for mdevice in mdevices:
             mdevice.device.set_color(lifxtools.bedtime_color)
+
+    def _set_to_theatre(self):
+        mdevices = self._get_selected_mdevices()
+        print("setting mdevices to theatre:",mdevices)
+        for mdevice in mdevices:
+            mdevice.device.set_color(lifxtools.theatre_color)
 
     def _save_state(self):
         mdevices = self._get_selected_mdevices()

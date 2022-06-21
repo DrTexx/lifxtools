@@ -11,7 +11,7 @@ script_requirements = ["wheel",
                        "lifxlan==1.2.5",
                        "netifaces==0.10.9",
                        "colorama==0.4.1",
-                       "numpy==1.17.0",
+                       "numpy==1.22.0",
                        "PyAudio==0.2.11"]
 readme_filename = 'README.md'
 readme_encoding = 'utf-8'
